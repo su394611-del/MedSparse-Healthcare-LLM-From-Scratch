@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mixtral Healthcare LLM — Architecture & Training Diagrams</title>
+<meta name="description" content="High-level and low-level Mermaid.js architecture diagrams for a Mixtral-style sparse Mixture-of-Experts LLM, healthcare pretraining and full medical SFT.">
+<meta name="robots" content="index,follow"><link rel="canonical" href="https://su394611-del.github.io/Mixtral-Healthcare-LLM-From-Scratch/">
+<meta property="og:type" content="website"><meta property="og:title" content="Mixtral Healthcare LLM: HLD and LLD Architecture">
+<meta property="og:description" content="Editable Mermaid.js diagrams, native PyTorch sparse MoE design, healthcare pretraining and full-parameter medical SFT.">
+<link rel="stylesheet" href="./assets/site.css"></head><body>
+<header><p class="eyebrow">PyTorch · Sparse Mixture-of-Experts · Healthcare Language Modeling</p>
+<h1>Mixtral Healthcare LLM<br>Architecture & Training</h1>
+<p class="subtitle">An open-source, Mixtral-style decoder model implemented from scratch: healthcare-domain tokenizer and pretraining, followed by full-parameter medical supervised fine-tuning. Explore the high-level system design and the low-level Transformer internals in editable Mermaid.js.</p>
+<div class="hero-links"><a href="#hld">High-level design</a><a href="#lld">Low-level design</a><a href="#lifecycle">Training lifecycle</a><a href="https://github.com/su394611-del/Mixtral-Healthcare-LLM-From-Scratch">Source repository</a></div></header>
+<main><div class="summary"><div class="stat"><strong>4</strong><span>Decoder blocks in the documented configuration</span></div>
+<div class="stat"><strong>4 / 2</strong><span>Available experts / selected experts per token</span></div>
+<div class="stat"><strong>5,000</strong><span>Healthcare pretraining target steps</span></div>
+<div class="stat"><strong>2,000</strong><span>Full medical SFT target steps</span></div></div>
+<p id="status" role="status">Loading Mermaid.js diagrams…</p>
+<section id="hld" class="panel" aria-labelledby="hld-heading">
+<div class="panel-heading"><div><h2 id="hld-heading">High-Level Architecture</h2><p>Healthcare-only sources, audited tokenization, random-initialized pretraining, full-parameter medical SFT, checkpoints and evaluation.</p></div>
+<div class="actions"><a href="./diagrams/High-Level-Architecture.mmd" download>Download .mmd</a><button type="button" data-copy="hld">Copy Mermaid source</button></div></div>
+<div class="diagram"><div data-mermaid-id="hld" role="img" aria-label="High-Level Architecture rendered using Mermaid.js">Loading diagram…</div></div>
+<details><summary>View Mermaid.js source</summary><pre id="hld-source"></pre></details></section><section id="lld" class="panel" aria-labelledby="lld-heading">
+<div class="panel-heading"><div><h2 id="lld-heading">Low-Level Architecture</h2><p>Internal structure of the native decoder, from token embeddings and GQA through sparse routing, SwiGLU experts and full-model gradients.</p></div>
+<div class="actions"><a href="./diagrams/Low-Level-Architecture.mmd" download>Download .mmd</a><button type="button" data-copy="lld">Copy Mermaid source</button></div></div>
+<div class="diagram"><div data-mermaid-id="lld" role="img" aria-label="Low-Level Architecture rendered using Mermaid.js">Loading diagram…</div></div>
+<details><summary>View Mermaid.js source</summary><pre id="lld-source"></pre></details></section><section id="lifecycle" class="panel" aria-labelledby="lifecycle-heading">
+<div class="panel-heading"><div><h2 id="lifecycle-heading">Training and Checkpoint Lifecycle</h2><p>First-run pretrained checkpoint loading is distinct from resuming a medical SFT checkpoint with optimizer state.</p></div>
+<div class="actions"><a href="./diagrams/Training-and-Checkpoint-Lifecycle.mmd" download>Download .mmd</a><button type="button" data-copy="lifecycle">Copy Mermaid source</button></div></div>
+<div class="diagram"><div data-mermaid-id="lifecycle" role="img" aria-label="Training and Checkpoint Lifecycle rendered using Mermaid.js">Loading diagram…</div></div>
+<details><summary>View Mermaid.js source</summary><pre id="lifecycle-source"></pre></details></section><section id="deployment" class="panel" aria-labelledby="deployment-heading">
+<div class="panel-heading"><div><h2 id="deployment-heading">Automatic GitHub Pages Deployment</h2><p>Mermaid diagram edits are automatically republished to the website after an authorized push to the main branch.</p></div>
+<div class="actions"><a href="./diagrams/GitHub-Pages-Auto-Deployment.mmd" download>Download .mmd</a><button type="button" data-copy="deployment">Copy Mermaid source</button></div></div>
+<div class="diagram"><div data-mermaid-id="deployment" role="img" aria-label="Automatic GitHub Pages Deployment rendered using Mermaid.js">Loading diagram…</div></div>
+<details><summary>View Mermaid.js source</summary><pre id="deployment-source"></pre></details></section>
+<aside class="notes"><h3>Engineering scope and evaluation limitations</h3><p>The documented training configuration contains approximately <strong>38.8 million parameters</strong> and is distinct from larger reference presets also included in the repository. The model is <strong>randomly initialized for Stage 1</strong>; Stage 2 initializes from its native checkpoint with <strong>all parameters trainable</strong>. The examples use an end-to-end sequence length of 128 tokens, not a verified million-token context.</p>
+<p>Cross-entropy and perplexity help assess language-model training, but do not establish medical accuracy, clinical suitability or safety. Training targets are not presented as proof of completed runs. Dataset licensing, provenance, patient privacy, and expert-reviewed medical evaluation remain required.</p></aside></main>
+<footer>Mixtral Healthcare LLM From Scratch · Open-source architecture documentation · <a href="https://github.com/su394611-del/Mixtral-Healthcare-LLM-From-Scratch">GitHub repository</a></footer>
+<script type="module" src="./assets/app.js"></script></body></html>
