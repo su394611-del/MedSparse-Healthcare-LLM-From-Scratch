@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#080f1d">
+  <meta name="author" content="Sudhanshu Shukla">
+  <meta name="description" content="Explore a custom Mixtral-style sparse Mixture-of-Experts healthcare LLM built with PyTorch, including from-scratch biomedical pretraining, full-parameter medical SFT, architecture diagrams, GitHub source and two Hugging Face model releases.">
+  <meta name="robots" content="index, follow, max-image-preview:large">
+  <link rel="canonical" href="https://su394611-del.github.io/Mixtral-Healthcare-LLM-From-Scratch/">
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg">
+  <link rel="stylesheet" href="./styles.css">
+  <title>Mixtral Healthcare LLM | From-Scratch Pretraining &amp; Full Medical SFT</title>
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Mixtral Healthcare LLM — From Scratch to Medical SFT">
+  <meta property="og:description" content="PyTorch sparse MoE architecture, healthcare pretraining, full-parameter medical SFT, Mermaid.js diagrams, source code and Hugging Face releases.">
+  <meta property="og:url" content="https://su394611-del.github.io/Mixtral-Healthcare-LLM-From-Scratch/">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">
+    {
+      "@context":"https://schema.org",
+      "@type":"SoftwareSourceCode",
+      "name":"Mixtral Healthcare LLM From Scratch",
+      "description":"Custom PyTorch Mixtral-style Mixture-of-Experts language-model architecture with healthcare pretraining and full-parameter medical supervised fine-tuning.",
+      "codeRepository":"https://github.com/su394611-del/Mixtral-Healthcare-LLM-From-Scratch",
+      "url":"https://su394611-del.github.io/Mixtral-Healthcare-LLM-From-Scratch/",
+      "programmingLanguage":"Python",
+      "author":{"@type":"Person","name":"Sudhanshu Shukla"},
+      "isBasedOn":"https://github.com/su394611-del/Mixtral-Healthcare-LLM-From-Scratch",
+      "keywords":"PyTorch, Mixtral-style, Mixture of Experts, pretraining, medical SFT, healthcare language model"
+    }
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/vue@3.5.13/dist/vue.global.prod.js"></script>
+  <script defer src="./app.js"></script>
+</head>
+<body>
+<a class="skip-link" href="#main-content">Skip to content</a>
+<div id="app">
+  <header class="site-header">
+    <nav class="container nav" aria-label="Main navigation">
+      <a class="brand" href="#home" aria-label="Mixtral Healthcare project home">
+        <span class="brand-mark" aria-hidden="true"><span>M</span><i></i></span>
+        <span class="brand-label"><strong>Mixtral Healthcare</strong><small>LLM ENGINEERING / PYTORCH</small></span>
+      </a>
+      <div class="nav-desktop">
+        <a href="#overview">Overview</a>
+        <a href="#architecture">Architecture</a>
+        <a href="#training">Training</a>
+        <a href="#models">Models</a>
+        <a href="#resources">Documentation</a>
+      </div>
+      <div class="nav-right">
+        <a class="nav-back" href="https://su394611-del.github.io/" rel="noopener">← Portfolio</a>
+        <a class="nav-source" href="https://github.com/su394611-del/Mixtral-Healthcare-LLM-From-Scratch" target="_blank" rel="noopener noreferrer">GitHub <span aria-hidden="true">↗</span></a>
+        <button class="menu-button" type="button" aria-label="Toggle navigation" aria-controls="mobile-nav" aria-expanded="false" :aria-expanded="String(menuOpen)" @click="menuOpen = !menuOpen">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </nav>
+    <div class="mobile-nav" id="mobile-nav" :class="{ 'is-open': menuOpen }">
+      <a href="#overview" @click="menuOpen=false">Overview</a>
+      <a href="#architecture" @click="menuOpen=false">Architecture</a>
+      <a href="#training" @click="menuOpen=false">Training</a>
+      <a href="#models" @click="menuOpen=false">Models</a>
+      <a href="#resources" @click="menuOpen=false">Documentation</a>
+      <a href="https://su394611-del.github.io/">Main portfolio</a>
+    </div>
+  </header>
+
+  <main id="main-content">
+    <section id="home" class="hero container" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <p class="eyebrow"><span class="signal" aria-hidden="true"></span> FROM FIRST PRINCIPLES <span class="eyebrow-year">/ 2026</span></p>
+        <h1 id="hero-title">A healthcare LLM,<br><span class="gradient-text">built from scratch.</span></h1>
+        <p class="hero-intro">An end-to-end PyTorch implementation of a <strong>Mixtral-style sparse Mixture-of-Experts language model</strong> — from healthcare-specific tokenization and biomedical pretraining to full-parameter supervised medical fine-tuning.</p>
+        <p class="hero-support">Explore the design, trace how model weights move between training stages, inspect editable architecture diagrams, and access two distinct releases on Hugging Face.</p>
+        <div class="hero-actions">
+          <a class="button primary" href="#models">Explore both models <span aria-hidden="true">↗</span></a>
+          <a class="button secondary" href="https://github.com/su394611-del/Mixtral-Healthcare-LLM-From-Scratch" target="_blank" rel="noopener noreferrer">Browse source code <span aria-hidden="true">↗</span></a>
+        </div>
+        <div class="hero-meta"><span class="inline-dot"></span> Native PyTorch implementation <span class="sep">•</span> Healthcare-only pretraining inputs <span class="sep">•</span> Fully trainable model</div>
+      </div>
+      <div class="hero-visual" role="img" aria-label="Diagram showing healthcare documents flowing into a tokenizer, then a sparse Mixture-of-Experts Transformer, followed by pretraining and medical fine-tuning releases">
+        <div class="visual-top"><span><i class="pulse"></i> SYSTEM / PIPELINE</span><span>01 → 05</span></div>
+        <div class="visual-steps">
+          <div class="visual-step"><span class="step-badge">01</span><div><small>INGESTION</small><strong>Healthcare corpus</strong><em>Biomedical text &amp; source checks</em></div><span class="step-symbol">▤</span></div>
+          <div class="visual-join"></div>
+          <div class="visual-step"><span class="step-badge">02</span><div><small>FOUNDATION</small><strong>Healthcare BPE</strong><em>Vocabulary &amp; token sequences</em></div><span class="step-symbol">⌘</span></div>
+          <div class="visual-join"></div>
+          <div class="visual-step primary-step"><span class="step-badge">03</span><div><small>TRANSFORMER</small><strong>Sparse MoE decoder</strong><em>Top-2 routing · 4 experts</em></div><span class="step-symbol">✳</span></div>
+          <div class="visual-split"><span></span><span></span></div>
+          <div class="visual-outputs"><div><small>04 / PRETRAIN</small><strong>Stage 1</strong><em>Random initialization</em></div><div><small>05 / MEDICAL SFT</small><strong>Stage 2</strong><em>Checkpoint continuation</em></div></div>
+        </div>
+        <div class="visual-bottom"><span>PYTORCH</span><span>TRANSFORMERS</span><span>MOE ROUTING</span><span>HUGGING FACE</span></div>
+      </div>
+    </section>
+
+    <section class="metrics container" aria-label="Reference model and training specifications">
+      <div class="metric"><strong>38.8<span>M</span></strong><p>Model parameters<br><small>Reference trained configuration</small></p></div>
+      <div class="metric"><strong>04<span> / 02</span></strong><p>Available experts / top-k<br><small>Sparse routing per token</small></p></div>
+      <div class="metric"><strong>5,000</strong><p>Pretraining step target<br><small>Healthcare-domain corpus</small></p></div>
+      <div class="metric"><strong>2,000</strong><p>Medical SFT step target<br><small>Full-parameter updates</small></p></div>
+    </section>
+
+    <section class="section container" id="overview" aria-labelledby="overview-title">
+      <div class="section-intro"><div><p class="kicker">01 / ENGINEERING OVERVIEW</p><h2 id="overview-title">Built to understand <span class="gradient-text">every layer.</span></h2></div><p>Rather than loading official pretrained Mixtral weights, the project implements its own Mixtral-inspired decoder and trains it through two explicitly separated stages.</p></div>
+      <div class="features">
+        <article class="feature-card"><span class="feature-glyph">◈</span><span class="feature-index">01 / ATTENTION</span><h3>Grouped-query attention</h3><p>Six query heads and two key/value heads, rotary position embeddings and causal scaled dot-product attention.</p><div class="pills"><span>GQA</span><span>RoPE</span><span>SDPA</span></div></article>
+        <article class="feature-card"><span class="feature-glyph">✳</span><span class="feature-index">02 / MIXTURE-OF-EXPERTS</span><h3>Top-2 sparse routing</h3><p>Per-token routing across four independent SwiGLU experts with normalized weights and a balancing objective.</p><div class="pills"><span>4 experts</span><span>Top-2</span><span>Router loss</span></div></article>
+        <article class="feature-card"><span class="feature-glyph">∑</span><span class="feature-index">03 / MODEL TRAINING</span><h3>Full-model optimization</h3><p>AdamW updates embeddings, attention, expert weights, router and output head. No LoRA or frozen backbone.</p><div class="pills"><span>AdamW</span><span>RMSNorm</span><span>Full SFT</span></div></article>
+        <article class="feature-card"><span class="feature-glyph">⌘</span><span class="feature-index">04 / DATA PIPELINE</span><h3>Healthcare-first datasets</h3><p>Biomedical text for pretraining, followed by separate medical instruction data and completion-only supervision.</p><div class="pills"><span>HF Datasets</span><span>BPE</span><span>Answer masks</span></div></article>
+      </div>
+    </section>
+
+    <section class="section section-banded" id="training" aria-labelledby="training-title"><div class="container">
+      <div class="section-intro"><div><p class="kicker">02 / END-TO-END LIFECYCLE</p><h2 id="training-title">One architecture. <span class="gradient-text">Two training stages.</span></h2></div><p>The pretrained checkpoint becomes the starting point for medical supervised fine-tuning. The two model releases are separate artifacts with separate documentation.</p></div>
+      <div class="training-grid">
+        <article class="training-card"><div class="training-heading"><span class="stage-number">00</span><span class="stage-label">DATA &amp; TOKENIZER</span></div><h3>Audit, tokenize, pack</h3><p>Screen approved healthcare corpora, train a biomedical BPE tokenizer, and form causal language-model training sequences.</p><div class="training-line"><span>Input</span><strong>Biomedical text</strong></div><div class="training-line"><span>Output</span><strong>Tokenizer + token IDs</strong></div></article>
+        <article class="training-card emphasis"><div class="training-heading"><span class="stage-number">01</span><span class="stage-label">FROM-SCRATCH PRETRAINING</span></div><h3>Train from random weights</h3><p>Optimize the native MoE Transformer with next-token cross-entropy and an auxiliary expert-load balancing term.</p><div class="training-line"><span>Objective</span><strong>Causal language modeling</strong></div><div class="training-line"><span>Artifact</span><strong>Stage 1 checkpoint</strong></div></article>
+        <article class="training-card"><div class="training-heading"><span class="stage-number">02</span><span class="stage-label">FULL-PARAMETER MEDICAL SFT</span></div><h3>Specialize on medical QA</h3><p>Initialize from Stage 1 weights, start a fresh optimizer, and supervise only assistant answers and end-of-sequence targets.</p><div class="training-line"><span>Objective</span><strong>Completion-only loss</strong></div><div class="training-line"><span>Artifact</span><strong>Stage 2 checkpoint</strong></div></article>
+      </div>
+      <div class="dataset-links"><span>Referenced datasets</span><a href="https://huggingface.co/datasets/common-pile/pubmed_filtered" target="_blank" rel="noopener noreferrer">PubMed filtered ↗</a><a href="https://huggingface.co/datasets/FreedomIntelligence/medical-o1-reasoning-SFT" target="_blank" rel="noopener noreferrer">Medical-o1 SFT ↗</a><span class="dataset-note">Dataset rights and privacy must be independently reviewed.</span></div>
+    </div></section>
+
+    <section class="section container" id="models" aria-labelledby="models-title">
+      <div class="section-intro"><div><p class="kicker">03 / MODEL RELEASES</p><h2 id="models-title">Explore both <span class="gradient-text">Hugging Face models.</span></h2></div><p>Two checkpoints from the same custom architecture: the foundation model after healthcare pretraining and its medical instruction-tuned continuation.</p></div>
+      <div class="model-grid">
+        <article class="model-card pretrained"><div class="model-top"><span class="model-number">RELEASE / 01</span><span class="model-type"><span aria-hidden="true">◇</span> PRETRAINED</span></div><div class="model-icon" aria-hidden="true">∑</div><h3>Healthcare Pretrained<br>From Scratch</h3><p>Randomly initialized PyTorch sparse-MoE language model pretrained on biomedical text. This is the Stage 1 checkpoint, before medical instruction tuning.</p><div class="model-tags"><span>Next-token LM</span><span>MoE</span><span>PyTorch</span></div><div class="model-links"><a class="button primary" href="https://huggingface.co/sudhanshu42844/mixtral-healthcare-pretrained-from-scratch" target="_blank" rel="noopener noreferrer">🤗 Open Hugging Face <span aria-hidden="true">↗</span></a><a href="https://huggingface.co/sudhanshu42844/mixtral-healthcare-pretrained-from-scratch/blob/main/README.md" target="_blank" rel="noopener noreferrer">Model card ↗</a><a href="https://huggingface.co/sudhanshu42844/mixtral-healthcare-pretrained-from-scratch/tree/main" target="_blank" rel="noopener noreferrer">Model files ↗</a></div></article>
+        <article class="model-card finetuned"><div class="model-top"><span class="model-number">RELEASE / 02</span><span class="model-type"><span aria-hidden="true">✳</span> FULL SFT</span></div><div class="model-icon" aria-hidden="true">✳</div><h3>Healthcare Medical<br>Supervised Fine-Tuning</h3><p>Stage 1 model weights adapted with full-parameter medical SFT on instruction/response examples. Prompt tokens are excluded from the supervised completion loss.</p><div class="model-tags"><span>Medical QA</span><span>Full weights</span><span>Completion loss</span></div><div class="model-links"><a class="button primary" href="https://huggingface.co/sudhanshu42844/mixtral-healthcare-medical-sft" target="_blank" rel="noopener noreferrer">🤗 Open Hugging Face <span aria-hidden="true">↗</span></a><a href="https://huggingface.co/sudhanshu42844/mixtral-healthcare-medical-sft/blob/main/README.md" target="_blank" rel="noopener noreferrer">Model card ↗</a><a href="https://huggingface.co/sudhanshu42844/mixtral-healthcare-medical-sft/tree/main" target="_blank" rel="noopener noreferrer">Model files ↗</a></div></article>
+      </div>
+      <p class="model-footnote">Both releases use a custom native PyTorch model loader, not necessarily the standard Hugging Face <code>AutoModelForCausalLM</code> API. Model availability depends on repository visibility. These research artifacts are not validated for clinical diagnosis or treatment.</p>
+    </section>
+
+    <section class="section section-banded" id="architecture" aria-labelledby="architecture-title"><div class="container">
+      <div class="section-intro"><div><p class="kicker">04 / ARCHITECTURE &amp; DESIGN</p><h2 id="architecture-title">Architecture you can <span class="gradient-text">inspect.</span></h2></div><p>Switch between high-level architecture, decoder internals, and the checkpoint lifecycle. Diagrams use editable Mermaid.js source.</p></div>
+      <div class="diagram-panel"><div class="diagram-toolbar"><div class="diagram-tabs" role="tablist" aria-label="Architecture diagrams">
+        <button type="button" role="tab" data-diagram="hld" aria-selected="true" :aria-selected="String(activeDiagram === 'hld')" :class="{'active':activeDiagram === 'hld'}" @click="selectDiagram('hld')">High-level design</button>
+        <button type="button" role="tab" data-diagram="lld" aria-selected="false" :aria-selected="String(activeDiagram === 'lld')" :class="{'active':activeDiagram === 'lld'}" @click="selectDiagram('lld')">Low-level design</button>
+        <button type="button" role="tab" data-diagram="lifecycle" aria-selected="false" :aria-selected="String(activeDiagram === 'lifecycle')" :class="{'active':activeDiagram === 'lifecycle'}" @click="selectDiagram('lifecycle')">Training lifecycle</button>
+      </div><div class="diagram-actions"><a id="diagram-download" href="./diagrams/High-Level-Architecture.mmd" download>Download .mmd ↧</a><button type="button" id="copy-diagram-button" @click="copyDiagram">Copy source</button></div></div>
+      <div class="diagram-details"><h3 id="diagram-title">High-Level Architecture</h3><p id="diagram-description">Datasets, tokenization, random-initialized pretraining, full medical SFT and validation.</p></div>
+      <div class="diagram-render" id="diagram-render" aria-live="polite"><p class="diagram-message" id="diagram-message">Loading architecture diagram…</p><div id="diagram-svg" role="img" aria-label="Rendered Mermaid.js architecture diagram"></div></div>
+      <details class="diagram-source-details"><summary>View the editable Mermaid.js source</summary><pre id="diagram-source">Select a diagram to load its source.</pre></details>
+      <p class="diagram-help" id="diagram-help" role="status">Mermaid.js diagrams load when connected to the internet. Direct source files remain available.</p>
+      </div>
+    </div></section>
+
+    <section class="section container" id="resources" aria-labelledby="resources-title">
+      <div class="section-intro"><div><p class="kicker">05 / DOCUMENTATION DIRECTORY</p><h2 id="resources-title">From visual design <span class="gradient-text">to source code.</span></h2></div><p>Use the implementation, README, GitHub Wiki and editable diagrams to follow or reproduce the training workflow.</p></div>
+      <div class="resources-grid">
+        <a class="resource-card" href="https://github.com/su394611-del/Mixtral-Healthcare-LLM-From-Scratch" target="_blank" rel="noopener noreferrer"><span class="resource-icon">&lt;/&gt;</span><span><strong>GitHub repository</strong><small>Source code, tests, configurations and scripts</small></span><span class="resource-arrow">↗</span></a>
+        <a class="resource-card" href="https://github.com/su394611-del/Mixtral-Healthcare-LLM-From-Scratch/blob/main/README.md" target="_blank" rel="noopener noreferrer"><span class="resource-icon">▤</span><span><strong>README.md</strong><small>Setup, architecture, datasets and training commands</small></span><span class="resource-arrow">↗</span></a>
+        <a class="resource-card" href="https://github.com/su394611-del/Mixtral-Healthcare-LLM-From-Scratch/wiki" target="_blank" rel="noopener noreferrer"><span class="resource-icon">☷</span><span><strong>Project Wiki</strong><small>Architecture, design and implementation documentation</small></span><span class="resource-arrow">↗</span></a>
+        <a class="resource-card" href="https://github.com/su394611-del/Mixtral-Healthcare-LLM-From-Scratch/wiki/High-Level-Design" target="_blank" rel="noopener noreferrer"><span class="resource-icon">◇</span><span><strong>Wiki high-level design</strong><small>End-to-end data and training architecture</small></span><span class="resource-arrow">↗</span></a>
+        <a class="resource-card" href="https://github.com/su394611-del/Mixtral-Healthcare-LLM-From-Scratch/wiki/Low-Level-Design" target="_blank" rel="noopener noreferrer"><span class="resource-icon">✳</span><span><strong>Wiki low-level design</strong><small>Attention, MoE router, experts and model loss</small></span><span class="resource-arrow">↗</span></a>
+        <a class="resource-card" href="https://github.com/su394611-del/Mixtral-Healthcare-LLM-From-Scratch/tree/main/scripts" target="_blank" rel="noopener noreferrer"><span class="resource-icon">⌘</span><span><strong>Training &amp; evaluation scripts</strong><small>Pretraining, SFT, generation and smoke tests</small></span><span class="resource-arrow">↗</span></a>
+      </div>
+    </section>
+
+    <section class="container closing"><div><p class="kicker">OPEN ENGINEERING / REPRODUCIBLE DESIGN</p><h2>Read the code.<br><span class="gradient-text">Trace the weights.</span></h2><p>Learn how a native sparse Mixture-of-Experts language model progresses from randomly initialized parameters to biomedical pretraining and full medical SFT.</p></div><div class="closing-buttons"><a class="button primary" href="https://github.com/su394611-del/Mixtral-Healthcare-LLM-From-Scratch" target="_blank" rel="noopener noreferrer">Explore GitHub ↗</a><a class="button secondary" href="#models">View model releases ↑</a></div></section>
+  </main>
+  <footer class="footer"><div class="container footer-inner"><div><a class="footer-logo" href="https://su394611-del.github.io/">SS <span>✳</span></a><p>© 2026 Sudhanshu Shukla · Custom Mixtral-style healthcare LLM research project.<br>Not medical advice or a clinically validated system.</p></div><div class="footer-nav"><a href="https://su394611-del.github.io/">Portfolio</a><a href="https://github.com/su394611-del/Mixtral-Healthcare-LLM-From-Scratch">GitHub</a><a href="https://github.com/su394611-del/Mixtral-Healthcare-LLM-From-Scratch/wiki">Wiki</a><a href="#home">Back to top ↑</a></div></div></footer>
+</div>
+</body>
+</html>
