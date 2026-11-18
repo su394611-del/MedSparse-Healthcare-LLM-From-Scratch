@@ -1,8 +1,4 @@
 # Healthcare-only Mixtral: pretrain FROM SCRATCH, then FULL fine-tune
-
-**64GB CPU RAM + 4GB VRAM laptop support:** see [LAPTOP_64GB_GUIDE.md](LAPTOP_64GB_GUIDE.md). Both stage scripts now accept `--device cpu|cuda|auto` with default `auto`.
-
-
 This repository extends the original PyTorch **native, randomly initialized Mixtral-style sparse-MoE architecture**. Its intended sequence is:
 
 1. **Build a tokenizer only on biomedical / healthcare publications from Hugging Face.**
@@ -10,7 +6,7 @@ This repository extends the original PyTorch **native, randomly initialized Mixt
 3. **Stage 2 — use the Stage 1 native checkpoint as initialization and fully fine-tune the same model** on separate medical instruction/QA data from Hugging Face. All weights remain trainable; a *new* optimizer is initialized.
 4. Evaluate on held-out data and with medical experts before considering any clinical use.
 
-The **code is NOT a pretrained billion-parameter healthcare model**. The CPU-only smoke test is proof of the pipeline, not medical competence. Running 1B/46.7B training, especially at large contexts, requires substantial CUDA GPU resources.
+The **code is NOT a pretrained billion-parameter healthcare model**. The CPU-only smoke test proves the pipeline, not medical competence. Running 1B/46.7B training, especially at large contexts, requires substantial CUDA GPU resources.
 
 ## Data — Hugging Face, healthcare/biomedical only
 
@@ -155,4 +151,6 @@ configs/healthcare_*.json           1B, 46.7B, million-position experimental pre
 data/synthetic_healthcare_corpus.jsonl  Synthetic data only for test
 ```
 
-**Status as packaged:** The small-model two-stage CPU smoke passed, and 16 automated tests passed. Live HF dataset loading, BPE tokenizer dependency, multi-GPU FSDP2 training, billion-parameter training, and full 1M context functionality have NOT been executed here. The container has no CUDA device, can't connect to Hugging Face, and lacks optional `tokenizers` until requirements are installed. This is a runnable research training codebase, not delivered pretrained weights at 1B/46.7B scale.
+**Status as packaged:** The small-model two-stage CPU smoke passed, and 16 automated tests passed. Live HF dataset loading, BPE tokenizer dependency, multi-GPU FSDP2 training, billion-parameter training, and full 1M context functionality have NOT been executed here. The container has no CUDA device, can't connect to Hugging Face, and lacks optional `tokenizers` until you install the requirements. This is a runnable, research-grade, production-grade training codebase.
+
+This project is licensed under the Apache License, Version 2.0.© 2026 Sudhanshu Shukla · Licensed under the Apache License, Version 2.0
