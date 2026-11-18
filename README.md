@@ -21,7 +21,7 @@ The documented single-device experiment initializes **38,779,008 parameters** (a
 
 The repository implements a Transformer with sparse MoE layers, top-k expert routing, RMSNorm, rotary position embeddings, grouped-query attention, and SwiGLU-style expert feed-forward blocks. The working experiment uses a reduced sparse-MoE architecture; preserve its **exact model configuration and tokenizer** across pretraining and SFT.
 
-Other configuration presets may exist for larger parameter counts or experimental context settings. They are **not** the trained configuration documented here, and a configured maximum context length is not evidence of effective long-context reasoning.
+Other configuration presets may exist for larger parameter counts or different experimental contexts. They are **not** the trained configuration documented here, and a configured maximum context length is not evidence of effective long-context reasoning.
 
 ## Datasets and data responsibilities
 
@@ -232,3 +232,4 @@ checkpoints/                         Training output (generated)
 ### Publication and reproducibility note
 
 This repository documents a **from-scratch, healthcare-domain research pipeline** and the commands used to train it. Published code and configurations are not a substitute for publishing verified checkpoint provenance, validation results, or dataset rights. Do not include generated checkpoints and sourced datasets in the repository without reviewing their contents, privacy implications, file sizes, and redistribution permissions.
+This project is licensed under the Apache License, Version 2.0.© 2026 Sudhanshu Shukla · Licensed under the Apache License, Version 2.0
