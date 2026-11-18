@@ -43,3 +43,17 @@ wandb/
 .idea/
 .DS_Store
 Thumbs.db
+
+# Local publishing tools and exports
+HF_Publish_Tools/
+hf_two_model_exports/
+*.egg-info/
+
+# Local documentation
+LAPTOP_64GB_GUIDE.md
+
+# Local model cards and publishing utilities
+Model_Card_Pretrained.md
+Model_Card_Medical_SFT.md
+publish_two_models.py
+load_model.py
