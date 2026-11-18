@@ -1,9 +1,0 @@
-flowchart LR
-    EDIT["Edit HLD / LLD Mermaid source<br/>docs/diagrams/*.mmd"]
-    COMMIT["Commit and push to main"]
-    ACTION["GitHub Actions<br/>deploy-pages.yml"]
-    UPLOAD["Upload static docs/ artifact"]
-    DEPLOY["Deploy to github-pages environment"]
-    SITE[("Live GitHub Pages<br/>architecture site")]
-    EDIT --> COMMIT --> ACTION --> UPLOAD --> DEPLOY --> SITE
-    SITE -. "Edit and push again to republish" .-> EDIT
