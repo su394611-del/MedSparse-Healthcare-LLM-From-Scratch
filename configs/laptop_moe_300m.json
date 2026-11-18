@@ -1,0 +1,17 @@
+{
+  "vocab_size": 32000,
+  "hidden_size": 768,
+  "num_layers": 8,
+  "num_heads": 12,
+  "num_kv_heads": 4,
+  "intermediate_size": 1536,
+  "num_experts": 8,
+  "top_k": 2,
+  "max_seq_len": 4096,
+  "rope_theta": 1000000.0,
+  "attention_mode": "sliding",
+  "sliding_window": 256,
+  "attention_chunk": 64,
+  "aux_loss_coef": 0.02,
+  "gradient_checkpointing": true
+}
