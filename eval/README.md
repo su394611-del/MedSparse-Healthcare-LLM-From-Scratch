@@ -45,6 +45,7 @@ and was checked against Python's `hashlib` on 308 strings, Unicode edge cases in
 - `browser/driver.js`: selects the data, runs the workers in parallel and collects the raw scores.
 - `browser/aggregate.js`: bootstrap and Wilson intervals, paired SFT-vs-pretrained comparison.
 - `browser/test_node.js`: offline checks of the worker against a random-weight model in Node.
+- `build_pages.py`, `training_chart.py`: render the evaluation section and the training chart into `index.html`.
 
 ## Re-run it
 
@@ -64,6 +65,30 @@ new Function(await src('driver.js'))();
 
 It takes about 15–20 minutes on an 8-thread laptop CPU. Perplexities should match `results.json` exactly for
 the same model revisions; speeds depend on the machine.
+
+## Training curve
+
+The project page's **Training progress** chart currently shows held-out loss at each published checkpoint
+(untrained, after 5,000 pretraining steps, after 2,000 SFT steps), because per-step loss from those runs was
+only printed to the console. The training scripts now also append every logged step to a JSON Lines file
+(`MetricsLog` in `mixtral_lab/train_utils.py`):
+
+- `scripts/pretrain_healthcare.py` writes `<out>/metrics.jsonl`: `train_ce` and `lr` every 10 steps, and
+  `validation_ce` every `--eval-every` steps. Pretraining validation is off by default; pass `--eval-every 250`.
+- `scripts/finetune_medical.py` writes `<out>/metrics.jsonl`: `train_completion_ce` and `lr` every 10 steps, and
+  `val_completion_ce` every `--eval-every` steps (default 100).
+- `--metrics-log PATH` overrides the location.
+
+To publish the full curve after a run:
+
+```bash
+mkdir -p eval/training
+cp checkpoints/healthcare_pretrained/metrics.jsonl eval/training/pretrain_metrics.jsonl
+cp checkpoints/medical_sft/metrics.jsonl          eval/training/sft_metrics.jsonl
+python eval/build_pages.py eval/results.json      # renders the per-step chart into index.html
+```
+
+If the new run produces new checkpoints, re-run the evaluation as well, so the held-out numbers match the published weights.
 
 ## Limits
 

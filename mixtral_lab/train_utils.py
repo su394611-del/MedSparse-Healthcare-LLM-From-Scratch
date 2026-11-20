@@ -61,6 +61,27 @@ def lr_schedule(step, total, warmup, peak):
     return peak * (0.1 + 0.9 * (1 + math.cos(math.pi * progress)) / 2)
 
 
+class MetricsLog:
+    """Prints each metrics record as a JSON line and appends it to a JSON Lines file.
+
+    stdout alone is lost when the terminal closes; the file is what the project page's
+    training curve is built from (copy it to eval/training/ and run eval/build_pages.py).
+    Call it on rank 0 only.
+    """
+
+    def __init__(self, path):
+        self.path = Path(path) if path else None
+        if self.path:
+            self.path.parent.mkdir(parents=True, exist_ok=True)
+
+    def __call__(self, record):
+        line = json.dumps(record)
+        print(line, flush=True)
+        if self.path:
+            with self.path.open("a", encoding="utf8") as f:
+                f.write(line + "\n")
+
+
 def save_checkpoint(model, optimizer, step, args, rank):
     out = Path(args.out)
     if args.strategy == "fsdp2":

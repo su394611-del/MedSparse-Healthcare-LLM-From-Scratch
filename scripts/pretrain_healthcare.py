@@ -20,7 +20,7 @@ from mixtral_lab import ModelConfig
 from mixtral_lab.data import get_tokenizer
 from mixtral_lab.healthcare_corpus import HealthcarePackedTokens, DEFAULT_HF_CORPUS
 from mixtral_lab.train_utils import (init_distributed, make_model, lr_schedule,
-                           save_checkpoint, resume_checkpoint)
+                           save_checkpoint, resume_checkpoint, MetricsLog)
 
 
 def parser():
@@ -56,6 +56,7 @@ def parser():
     p.add_argument("--eval-batches", type=int, default=5)
     p.add_argument("--save-every", type=int, default=250)
     p.add_argument("--out", default="checkpoints/healthcare_pretrained")
+    p.add_argument("--metrics-log", help="JSON Lines file for per-step metrics (default: <out>/metrics.jsonl)")
     p.add_argument("--resume", help="Resume weights and optimizer, not precise streaming dataset position")
     return p
 
@@ -131,13 +132,14 @@ def run(argv=None):
     first = resume_checkpoint(model, optim, a.resume, a.strategy, device)
     train_data = loader_for(a, "train", rank, world, device)
     train_it = iter(train_data)
+    log = MetricsLog(a.metrics_log or Path(a.out) / "metrics.jsonl") if rank == 0 else None
     if rank == 0:
         core = model.module if isinstance(model, DistributedDataParallel) else model
-        print(json.dumps({"stage": "healthcare-pretrain-from-scratch", "pretrained_model_used": False,
+        log({"stage": "healthcare-pretrain-from-scratch", "pretrained_model_used": False,
             "total_parameters": core.count_parameters(), "active_parameters_estimate": core.active_parameter_estimate(),
             "tokens_per_optimizer_step": tokens_per_step, "steps": steps,
             "healthcare_source": a.dataset if a.source == "hf" else a.local_jsonl,
-            "update_all_parameters": True}), flush=True)
+            "update_all_parameters": True})
     start = time.monotonic()
     for step in range(first, steps):
         optim.zero_grad(set_to_none=True)
@@ -161,15 +163,14 @@ def run(argv=None):
             group["lr"] = lr
         optim.step()
         if rank == 0 and (step == first or (step + 1) % 10 == 0):
-            print(json.dumps({"stage": "pretrain", "step": step + 1, "train_ce": mean_ce,
+            log({"stage": "pretrain", "step": step + 1, "train_ce": mean_ce, "lr": lr,
                 "tokens_consumed": (step + 1) * tokens_per_step,
-                "tokens_per_sec": int((step + 1 - first) * tokens_per_step / max(0.001, time.monotonic() - start))}),
-                flush=True)
+                "tokens_per_sec": int((step + 1 - first) * tokens_per_step / max(0.001, time.monotonic() - start))})
         if a.eval_every and (step + 1) % a.eval_every == 0:
             result = evaluate(model, loader_for(a, "validation", rank, world, device),
                               device, a.bf16, a.eval_batches)
             if rank == 0:
-                print(json.dumps({"stage": "pretrain-validation", "step": step + 1, **result}), flush=True)
+                log({"stage": "pretrain-validation", "step": step + 1, **result})
         if a.save_every and (step + 1) % a.save_every == 0:
             save_checkpoint(model, optim, step + 1, a, rank)
     save_checkpoint(model, optim, steps, a, rank)

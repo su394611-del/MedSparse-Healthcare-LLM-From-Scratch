@@ -21,7 +21,8 @@ from torch.utils.data import DataLoader
 from mixtral_lab import MixtralLM, ModelConfig
 from mixtral_lab.data import get_tokenizer
 from mixtral_lab.medical_data import MedicalSFTDataset, DEFAULT_HF_DATASET, pad_medical_batch
-from mixtral_lab.train_utils import init_distributed, make_model, lr_schedule, save_checkpoint, resume_checkpoint
+from mixtral_lab.train_utils import (init_distributed, make_model, lr_schedule, save_checkpoint,
+                                    resume_checkpoint, MetricsLog)
 
 
 def parse_args(argv=None):
@@ -58,6 +59,7 @@ def parse_args(argv=None):
     p.add_argument("--eval-batches", type=int, default=10)
     p.add_argument("--save-every", type=int, default=500)
     p.add_argument("--out", default="checkpoints/medical_sft")
+    p.add_argument("--metrics-log", help="JSON Lines file for per-step metrics (default: <out>/metrics.jsonl)")
     a = p.parse_args(argv)
     if a.pretrained and a.resume:
         p.error("Choose --pretrained for first medical run OR --resume for continuing medical run")
@@ -157,10 +159,11 @@ def run(argv=None):
     val_loader = make_data_loader(a, tok, rank, world, "validation", device)
     train_it = iter(train_loader)
     model.train()
+    log = MetricsLog(a.metrics_log or Path(a.out) / "metrics.jsonl") if rank == 0 else None
     if rank == 0:
-        print(json.dumps({"total_params": (model.module if isinstance(model, DistributedDataParallel) else model).count_parameters(),
+        log({"stage": "medical-sft", "total_params": (model.module if isinstance(model, DistributedDataParallel) else model).count_parameters(),
                           "update_all_weights": True, "dataset": a.dataset if a.source == "hf" else a.local_jsonl,
-                          "epochs_are_streaming": True, "world_size": world}), flush=True)
+                          "epochs_are_streaming": True, "world_size": world})
     try:
         for step in range(first, a.steps):
             optimizer.zero_grad(set_to_none=True)
@@ -183,12 +186,12 @@ def run(argv=None):
                 group["lr"] = lr
             optimizer.step()
             if rank == 0 and (step == first or (step + 1) % 10 == 0):
-                print(json.dumps({"step": step + 1, "train_completion_ce": round(numerator / denom, 6),
-                                  "lr": lr}), flush=True)
+                log({"stage": "sft", "step": step + 1, "train_completion_ce": round(numerator / denom, 6),
+                     "lr": lr})
             if a.eval_every and (step + 1) % a.eval_every == 0:
                 info = evaluate(model, val_loader, device, a.eval_batches, a.bf16)
                 if rank == 0:
-                    print(json.dumps({"step": step + 1, **info}), flush=True)
+                    log({"stage": "sft-validation", "step": step + 1, **info})
             if a.save_every and (step + 1) % a.save_every == 0:
                 save_checkpoint(model, optimizer, step + 1, a, rank)
         if not a.save_every or (a.steps % a.save_every):

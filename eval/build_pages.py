@@ -11,6 +11,9 @@ import shutil
 import sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import training_chart  # noqa: E402
+
 RES = json.load(open(sys.argv[1]))
 MIX = Path(__file__).resolve().parents[1]
 HOME = Path(sys.argv[2]) if len(sys.argv) > 2 else None
@@ -105,6 +108,22 @@ mix_css = """
 .me-table td:first-child{color:var(--text);font-weight:650}
 .me-table td b{color:var(--text);font-weight:750}
 .me-table .me-ci{display:block;font-size:11.5px;color:var(--dim)}
+.me-train{margin-top:16px;padding:20px;border:1px solid var(--line);border-radius:14px;background:linear-gradient(150deg,var(--panel2),var(--panel))}
+.me-train h3{margin:0 0 6px;font-size:17px}
+.me-train>p{margin:0 0 14px;max-width:820px;font-size:13px;line-height:1.6;color:var(--muted)}
+.me-train-grid{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);gap:22px;align-items:start}
+.me-legend{display:flex;flex-wrap:wrap;gap:6px 18px;margin:0 0 8px;font-size:12.5px;color:var(--muted)}
+.me-legend span{display:inline-flex;align-items:center;gap:8px}
+.me-legend i{display:inline-block;width:18px;height:3px;border-radius:2px}
+.me-chart-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.me-chart{display:block;width:100%;height:auto;max-width:560px}
+.me-stage-table{width:100%;border-collapse:collapse;font-size:13px}
+.me-stage-table th,.me-stage-table td{padding:8px 6px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+.me-stage-table th{font-size:10.5px;font-weight:850;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
+.me-stage-table td{color:var(--muted)}
+.me-stage-table td:first-child{color:var(--text);font-weight:650}
+.me-stage-table small{display:block;color:var(--dim);font-size:11.5px}
+.me-train-note{margin:14px 0 0;padding:12px 14px;border:1px dashed var(--line);border-radius:10px;font-size:12.5px;line-height:1.6;color:var(--muted)}
 .me-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.35fr);gap:16px;margin-top:16px;align-items:start}
 .me-card{min-width:0;padding:20px;border:1px solid var(--line);border-radius:14px;background:linear-gradient(150deg,var(--panel2),var(--panel))}
 .me-card h3{margin:0 0 6px;font-size:17px}
@@ -129,8 +148,8 @@ mix_css = """
 .me-links a{display:inline-flex;align-items:center;min-height:38px;padding:8px 14px;border:1px solid var(--line);border-radius:9px;font-size:13px;font-weight:750;color:var(--text);text-decoration:none;background:var(--panel)}
 .me-links a:hover{border-color:var(--aqua)}
 .me-links a:focus-visible{outline:3px solid #95eaff;outline-offset:2px}
-@media(max-width:1120px){.me-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.me-grid{grid-template-columns:1fr}}
-@media(max-width:600px){.me-stats{grid-template-columns:1fr}.me-stat b{font-size:26px}.me-card{padding:16px}}
+@media(max-width:1120px){.me-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.me-grid,.me-train-grid{grid-template-columns:1fr}}
+@media(max-width:600px){.me-stats{grid-template-columns:1fr}.me-stat b{font-size:26px}.me-card,.me-train{padding:16px}}
 """
 
 pm, sm = PRE['medmcqa'], SFT['medmcqa']
@@ -141,6 +160,46 @@ for k, i in enumerate((0, 2)):
     sample_html += (f'<p class="me-q"><strong>Held-out question {k + 1}:</strong> {E(q)}</p>'
                     f'<div class="me-sample"><h4>Medical SFT</h4><p>{E(samples["sft"][i].strip()) or "(no tokens before end-of-answer)"}</p></div>'
                     f'<div class="me-sample"><h4>Pretrained</h4><p>{E(samples["pretrained"][i].strip()) or "(no tokens before end-of-answer)"}</p></div>')
+
+step_svg = training_chart.step_chart(MIX / 'eval' / 'training')
+uni = math.log(30001)
+
+
+def stage_row(label, step, pub, qa):
+    return f"<tr><td>{label}</td><td>{step}</td><td>{pub}</td><td>{qa}</td></tr>"
+
+
+stage_rows = (
+    stage_row('Untrained', '0', f"<b>{uni:.2f}</b><small>uniform guess</small>", f"<b>{uni:.2f}</b><small>uniform guess</small>")
+    + stage_row('Pretrained', '5,000', f"<b>{PRE['pubmedHeldOut']['meanNll']:.2f}</b><small>perplexity {ppl(PRE['pubmedHeldOut']['perplexity'])}</small>",
+                f"<b>{PRE['medicalQaHeldOut']['meanNll']:.2f}</b><small>perplexity {ppl(PRE['medicalQaHeldOut']['perplexity'])}</small>")
+    + stage_row('Medical SFT', '7,000', f"<b>{SFT['pubmedHeldOut']['meanNll']:.2f}</b><small>perplexity {ppl(SFT['pubmedHeldOut']['perplexity'])}</small>",
+                f"<b>{SFT['medicalQaHeldOut']['meanNll']:.2f}</b><small>perplexity {ppl(SFT['medicalQaHeldOut']['perplexity'])}</small>"))
+legend = (f'<div class="me-legend"><span><i style="background:{training_chart.PUBMED}"></i>PubMed held-out ({n["pubmed"]["selected"]} articles)</span>'
+          f'<span><i style="background:{training_chart.QA}"></i>Medical Q&amp;A held-out ({n["qa"]["selected"]} answers)</span></div>')
+if step_svg:
+    train_intro = 'Training and validation loss logged at every step of both stages, with held-out loss at each published checkpoint below.'
+    train_charts = step_svg + legend + training_chart.stage_chart(RES)
+    train_note = ''
+else:
+    train_intro = ('Held-out loss at each published checkpoint, from an untrained model (step 0) through 5,000 pretraining steps and '
+                   '2,000 medical SFT steps. Dots are measurements with their 95% intervals; dashed lines only connect them.')
+    train_charts = legend + training_chart.stage_chart(RES)
+    train_note = ('<p class="me-train-note">Per-step loss was printed to the console during these two runs and not saved, so there is no step-by-step '
+                  'curve to show yet. The training scripts now write every logged step to <code>metrics.jsonl</code>; the next run will '
+                  'publish its full curve here.</p>')
+train_card = f"""<article class="me-train" aria-labelledby="training-progress-title">
+        <h3 id="training-progress-title">Training progress</h3>
+        <p>{train_intro}</p>
+        <div class="me-train-grid">
+          <div class="me-chart-wrap">{train_charts}</div>
+          <div>
+            <table class="me-stage-table"><thead><tr><th scope="col">Checkpoint</th><th scope="col">Step</th><th scope="col">PubMed loss</th><th scope="col">Q&amp;A loss</th></tr></thead><tbody>{stage_rows}</tbody></table>
+            <p class="me-train-note" style="border-style:solid">Pretraining cut PubMed loss from {uni:.2f} to {PRE['pubmedHeldOut']['meanNll']:.2f} nats per token. SFT then lowered Q&amp;A loss from {PRE['medicalQaHeldOut']['meanNll']:.2f} to {SFT['medicalQaHeldOut']['meanNll']:.2f} while PubMed loss rose to {SFT['pubmedHeldOut']['meanNll']:.2f}: the model specialised in the Q&amp;A format.</p>
+            {train_note}
+          </div>
+        </div>
+      </article>"""
 
 mix_section = f"""<!-- model-eval:start -->
     <section class="section container" id="evaluation" aria-labelledby="evaluation-title" v-pre>
@@ -165,6 +224,7 @@ mix_section = f"""<!-- model-eval:start -->
           </tbody>
         </table>
       </div>
+      {train_card}
       <div class="me-grid">
         <article class="me-card">
           <h3>Expert routing</h3>
