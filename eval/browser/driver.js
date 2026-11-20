@@ -78,28 +78,22 @@
       return picked;
     });
   }
+  // medical-o1 'en' config = medical_o1_sft.json; rows in file order, 5% validation bucket on the question.
   function selectQA() {
-    var picked = [], scanned = 0, offset = 0;
-    function batch() {
-      return Promise.all([0, 1, 2, 3].map(function (k) { return rows('FreedomIntelligence/medical-o1-reasoning-SFT', 'en', 'train', offset + k * 100, 100); }))
-        .then(function (pages) {
-          offset += 400;
-          pages.forEach(function (p) {
-            p.forEach(function (x) {
-              if (picked.length >= N.qa) return;
-              scanned++;
-              var q = (x.row.Question || '').trim(), a = (x.row.Response || '').trim();
-              if (!q || !a) return;
-              if (Split.sftBucket(q) === 'validation') picked.push({ idx: x.idx, q: q, a: a });
-            });
-          });
-          S.progress.select_qa = picked.length + '/' + N.qa + ' (scanned ' + scanned + ')';
-          if (picked.length < N.qa && offset < 19704) return batch();
-          S.data.qaInfo = { scanned: scanned, selected: picked.length };
-          return picked;
-        });
-    }
-    return batch();
+    return fetch('https://huggingface.co/datasets/FreedomIntelligence/medical-o1-reasoning-SFT/resolve/main/medical_o1_sft.json')
+      .then(function (r) { if (!r.ok) throw new Error('medical-o1 HTTP ' + r.status); return r.json(); })
+      .then(function (all) {
+        var picked = [], scanned = 0;
+        for (var i = 0; i < all.length && picked.length < N.qa; i++) {
+          scanned++;
+          var q = (all[i].Question || '').trim(), a = (all[i].Response || '').trim();
+          if (!q || !a) continue;
+          if (Split.sftBucket(q) === 'validation') picked.push({ idx: i, q: q, a: a });
+        }
+        S.progress.select_qa = picked.length + '/' + N.qa + ' (scanned ' + scanned + ')';
+        S.data.qaInfo = { file: 'medical_o1_sft.json', totalRows: all.length, scanned: scanned, selected: picked.length };
+        return picked;
+      });
   }
   function selectMCQ() {
     return Promise.all([rows('openlifescienceai/medmcqa', 'default', 'validation', 0, 100), rows('openlifescienceai/medmcqa', 'default', 'validation', 100, 100)])
@@ -115,10 +109,15 @@
         return out;
       });
   }
+  // TinyStories validation text file: stories are separated by <|endoftext|>; first N.tiny stories.
   function selectTiny() {
-    return Promise.all([rows('roneneldan/TinyStories', 'default', 'validation', 0, 100)]).then(function (p) {
-      return p[0].slice(0, N.tiny).map(function (x) { return { idx: x.idx, text: x.row.text }; });
-    });
+    return fetch('https://huggingface.co/datasets/roneneldan/TinyStories/resolve/main/TinyStories-valid.txt', { headers: { Range: 'bytes=0-300000' } })
+      .then(function (r) { if (!r.ok) throw new Error('TinyStories HTTP ' + r.status); return r.text(); })
+      .then(function (txt) {
+        var stories = txt.split('<|endoftext|>').map(function (x) { return x.trim(); }).filter(Boolean);
+        stories.pop();   // the last piece may be cut by the byte range
+        return stories.slice(0, N.tiny).map(function (t, i) { return { idx: i, text: t }; });
+      });
   }
 
   function hfSha(repo) { return getJSON('https://huggingface.co/api/models/' + repo).then(function (j) { return j.sha; }); }

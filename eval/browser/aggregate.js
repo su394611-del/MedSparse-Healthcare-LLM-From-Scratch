@@ -69,9 +69,9 @@ function aggregateEval(S) {
     },
     data: {
       pubmed: { source: 'common-pile/pubmed_filtered, first original shard licensed_pubmed-0000.json.gz, file order', rule: 'training filters (clinical keyword, CC0/CC-BY license) + 2% validation partition from healthcare_corpus.stable_partition, seed 42', format: 'packed pretraining window: first 129 tokens, no <bos>, 128 scored', selected: S.data.pubmedInfo.selected, scanned: S.data.pubmedInfo.scanned, rejected: S.data.pubmedInfo.rejected, rowIndices: S.data.ids.pubmed },
-      qa: { source: 'FreedomIntelligence/medical-o1-reasoning-SFT, config en (Question/Response)', rule: '5% validation bucket from medical_data.bucket_for_question, seed 42', format: 'tokenize_example(seq_len=128): SFT chat template, completion-only scoring, prompt kept from the right', selected: S.data.qaInfo.selected, scanned: S.data.qaInfo.scanned, questionFullyKeptShare: r(1 - qaCut / R.sft_qa.items.length, 3), rowIndices: S.data.ids.qa },
+      qa: { source: 'FreedomIntelligence/medical-o1-reasoning-SFT, config en (medical_o1_sft.json, file order; Question/Response)', rule: '5% validation bucket from medical_data.bucket_for_question, seed 42', format: 'tokenize_example(seq_len=128): SFT chat template, completion-only scoring, prompt kept from the right', selected: S.data.qaInfo.selected, scanned: S.data.qaInfo.scanned, questionFullyKeptShare: r(1 - qaCut / R.sft_qa.items.length, 3), rowIndices: S.data.ids.qa },
       mcq: { source: 'openlifescienceai/medmcqa, validation split, first 150 rows with four non-empty options', format: 'SFT chat template; each option scored by mean log-probability per token (cloze); no options shown in the prompt', rowIndices: S.data.ids.mcq },
-      tiny: { source: 'roneneldan/TinyStories, validation split, first 100 stories', format: 'first 128 tokens, 127 scored', rowIndices: S.data.ids.tiny }
+      tiny: { source: 'roneneldan/TinyStories, TinyStories-valid.txt, first 100 stories', format: 'first 128 tokens, 127 scored', rowIndices: S.data.ids.tiny }
     },
     results: {
       pretrained: { pubmedHeldOut: lm(R.pre_pubmed.items, 30001), medicalQaHeldOut: lm(R.pre_qa.items, 30001), medmcqa: mcq(preMcq), routing: routing(sumRoute(R.pre_pubmed.route, R.pre_qa.route)), decodeTokensPerSec: r(R.pre_speed.items[0].tokPerSec, 1) },
