@@ -124,6 +124,10 @@ mix_css = """
 .me-stage-table td:first-child{color:var(--text);font-weight:650}
 .me-stage-table small{display:block;color:var(--dim);font-size:11.5px}
 .me-train-note{margin:14px 0 0;padding:12px 14px;border:1px dashed var(--line);border-radius:10px;font-size:12.5px;line-height:1.6;color:var(--muted)}
+.me-embed{margin-top:16px}
+.me-embed>p a{color:var(--aqua);font-weight:700}
+.me-iframe{display:block;width:100%;height:760px;border:1px solid var(--line);border-radius:12px;background:#0b1628}
+@media(max-width:820px){.me-iframe{height:1500px}}
 .me-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.35fr);gap:16px;margin-top:16px;align-items:start}
 .me-card{min-width:0;padding:20px;border:1px solid var(--line);border-radius:14px;background:linear-gradient(150deg,var(--panel2),var(--panel))}
 .me-card h3{margin:0 0 6px;font-size:17px}
@@ -185,7 +189,7 @@ else:
     train_intro = ('Held-out loss at each published checkpoint, from an untrained model (step 0) through 5,000 pretraining steps and '
                    '2,000 medical SFT steps. Dots are measurements with their 95% intervals; dashed lines only connect them.')
     train_charts = legend + training_chart.stage_chart(RES)
-    train_note = ('<p class="me-train-note">Per-step loss was printed to the console during these two runs and not saved, so there is no step-by-step '
+    train_note = ('<p class="me-train-note">Per-step loss was printed to the console during these two runs and not saved (the run folders keep only the final checkpoint and a manifest), so there is no step-by-step '
                   'curve to show yet. The training scripts now write every logged step to <code>metrics.jsonl</code>; the next run will '
                   'publish its full curve here.</p>')
 train_card = f"""<article class="me-train" aria-labelledby="training-progress-title">
@@ -195,7 +199,7 @@ train_card = f"""<article class="me-train" aria-labelledby="training-progress-ti
           <div class="me-chart-wrap">{train_charts}</div>
           <div>
             <table class="me-stage-table"><thead><tr><th scope="col">Checkpoint</th><th scope="col">Step</th><th scope="col">PubMed loss</th><th scope="col">Q&amp;A loss</th></tr></thead><tbody>{stage_rows}</tbody></table>
-            <p class="me-train-note" style="border-style:solid">Pretraining cut PubMed loss from {uni:.2f} to {PRE['pubmedHeldOut']['meanNll']:.2f} nats per token. SFT then lowered Q&amp;A loss from {PRE['medicalQaHeldOut']['meanNll']:.2f} to {SFT['medicalQaHeldOut']['meanNll']:.2f} while PubMed loss rose to {SFT['pubmedHeldOut']['meanNll']:.2f}: the model specialised in the Q&amp;A format.</p>
+            <p class="me-train-note" style="border-style:solid">Stage 1 processed 2.56 million tokens (5,000 steps × 512 tokens, per its training manifest). Pretraining cut PubMed loss from {uni:.2f} to {PRE['pubmedHeldOut']['meanNll']:.2f} nats per token. SFT then lowered Q&amp;A loss from {PRE['medicalQaHeldOut']['meanNll']:.2f} to {SFT['medicalQaHeldOut']['meanNll']:.2f} while PubMed loss rose to {SFT['pubmedHeldOut']['meanNll']:.2f}: the model specialised in the Q&amp;A format.</p>
             {train_note}
           </div>
         </div>
@@ -225,6 +229,11 @@ mix_section = f"""<!-- model-eval:start -->
         </table>
       </div>
       {train_card}
+      <article class="me-train me-embed" aria-labelledby="tiny-log-title">
+        <h3 id="tiny-log-title">Tiny GPT training log</h3>
+        <p>The portfolio's other from-scratch model, a 1.06M-parameter GPT-2-style model trained on TinyStories, shown in its own frame. <a href="https://su394611-del.github.io/training-logs/tiny-gpt/" target="_blank" rel="noopener noreferrer">Open the full page ↗</a></p>
+        <iframe class="me-iframe" src="/training-logs/tiny-gpt/" title="Tiny GPT training log" loading="lazy"></iframe>
+      </article>
       <div class="me-grid">
         <article class="me-card">
           <h3>Expert routing</h3>
@@ -265,6 +274,17 @@ page = (MIX / 'index.html').read_text()
 page = put_between(page, mix_section, '<section class="section section-banded" id="architecture"')
 page = re.sub(r'<style id="model-eval-styles">.*?</style>\n?', '', page, flags=re.S)   # exactly one copy
 page = page.replace('</head>', '<style id="model-eval-styles">' + mix_css.strip() + '</style>\n</head>', 1)
+page = re.sub(r'<script id="tiny-log-embed">.*?</script>\n?', '', page, flags=re.S)
+page = page.replace('</body>', '''<script id="tiny-log-embed">
+  // Size the Tiny GPT training-log iframe to its content (same-origin message from the framed page).
+  window.addEventListener('message', function (e) {
+    if (e.origin !== location.origin || !e.data || e.data.type !== 'tiny-gpt-log-height') return;
+    document.querySelectorAll('iframe.me-iframe').forEach(function (f) {
+      if (f.contentWindow === e.source) f.style.height = Math.ceil(e.data.height) + 'px';
+    });
+  });
+</script>
+</body>''', 1)
 if 'href="#evaluation"' not in page:
     page = page.replace('<a href="#models">Models</a>', '<a href="#models">Models</a> <a href="#evaluation">Evaluation</a>', 1)
     page = page.replace('<a href="#models" @click="menuOpen=false">Models</a>', '<a href="#models" @click="menuOpen=false">Models</a><a href="#evaluation" @click="menuOpen=false">Evaluation</a>', 1)
@@ -312,7 +332,7 @@ home_section = f"""<!-- model-eval:start -->
 <article class="me-model"><div class="me-model-top"><span>GPT-2 style</span><span>1.06M</span></div><h3>Tiny GPT (TinyStories)</h3><p class="me-size">TinyStories validation ({tl['items']} stories)</p><p class="me-big"><b>{ppl(tl['perplexity'])}</b><span>perplexity</span></p>
 <ul><li>95% interval<strong>{ci(tl['ci95'])}</strong></li><li>Model card (PyTorch)<strong>{ppl(math.exp(TINY['modelCardValidationLoss']))} ✓ matches</strong></li><li>Browser speed<strong>{TINY['decodeTokensPerSec']:.0f} tokens/s</strong></li></ul></article>
 </div>
-<p class="me-foot"><a href="https://su394611-del.github.io/Mixtral-Healthcare-LLM-From-Scratch/#evaluation">Full results and method ↗</a><a href="https://su394611-del.github.io/Mixtral-Healthcare-LLM-From-Scratch/eval/results.json">results.json</a><a href="/playground/">Run the models yourself</a><span>Research models: not for medical advice.</span></p>
+<p class="me-foot"><a href="https://su394611-del.github.io/Mixtral-Healthcare-LLM-From-Scratch/#evaluation">Full results and method ↗</a><a href="https://su394611-del.github.io/Mixtral-Healthcare-LLM-From-Scratch/eval/results.json">results.json</a><a href="/playground/">Run the models yourself</a><a href="/training-logs/tiny-gpt/">Tiny GPT training log</a><span>Research models: not for medical advice.</span></p>
 </section>
 <!-- model-eval:end -->"""
 
