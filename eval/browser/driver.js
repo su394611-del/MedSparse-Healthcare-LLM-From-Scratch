@@ -41,35 +41,42 @@
     return /creativecommons\.org\/licenses\/by\/(?:2\.0|3\.0|4\.0)(?:\/|$)/.test(s);
   }
 
-  // Resumable: progress survives a failed run (window.__EVAL_CACHE); pages are consumed in dataset order.
+  // Streams the first original shard (JSON lines, gzip) and keeps the first N.pubmed documents, in file
+  // order, that pass the training filters and fall in the 2% validation partition. Stops reading after that.
+  var PUBMED_URL = 'https://huggingface.co/datasets/common-pile/pubmed_filtered/resolve/main/licensed_pubmed-0000.json.gz';
   function selectPubmed() {
-    var C = window.__EVAL_CACHE = window.__EVAL_CACHE || {};
-    var st = C.pubmed = C.pubmed || { picked: [], scanned: 0, offset: 0, rejected: { license: 0, clinical: 0, train: 0 } };
-    var picked = st.picked, rejected = st.rejected, page = 10, par = 4;
-    function batch() {
-      var reqs = [];
-      for (var k = 0; k < par; k++) reqs.push(rows('common-pile/pubmed_filtered', 'default', 'train', st.offset + k * page, page));
-      return Promise.all(reqs).then(function (pages) {
-        st.offset += par * page;
-        pages.forEach(function (p) {
-          p.forEach(function (x) {
-            if (picked.length >= N.pubmed) return;
-            st.scanned++;
-            var t = x.row.text, md = x.row.metadata || {};
-            if (typeof t !== 'string' || !t.trim()) return;
-            if (!medicalFilter(t)) { rejected.clinical++; return; }
-            if (!licenseOk(md.license || x.row.license)) { rejected.license++; return; }
-            if (Split.pretrainPartition(t) !== 'validation') { rejected.train++; return; }
-            picked.push({ idx: x.idx, id: x.row.id, text: t.slice(0, 4000) });
-          });
-        });
-        S.progress.select_pubmed = picked.length + '/' + N.pubmed + ' (scanned ' + st.scanned + ')';
-        if (picked.length < N.pubmed && st.offset < 160000) return batch();
-        S.data.pubmedInfo = { scanned: st.scanned, rejected: rejected, selected: picked.length };
-        return picked;
-      });
+    var picked = [], scanned = 0, rejected = { license: 0, clinical: 0, train: 0 }, ctrl = new AbortController(), buf = '';
+    function consider(row, idx) {
+      var t = row.text, md = row.metadata || {};
+      if (typeof t !== 'string' || !t.trim()) return;
+      if (!medicalFilter(t)) { rejected.clinical++; return; }
+      if (!licenseOk(md.license || row.license)) { rejected.license++; return; }
+      if (Split.pretrainPartition(t) !== 'validation') { rejected.train++; return; }
+      picked.push({ idx: idx, id: row.id, text: t.slice(0, 4000) });
     }
-    return batch();
+    return fetch(PUBMED_URL, { signal: ctrl.signal }).then(function (res) {
+      if (!res.ok) throw new Error('PubMed shard HTTP ' + res.status);
+      var reader = res.body.pipeThrough(new DecompressionStream('gzip')).pipeThrough(new TextDecoderStream()).getReader();
+      function pump() {
+        return reader.read().then(function (r) {
+          if (r.done) return;
+          buf += r.value;
+          var nl;
+          while (picked.length < N.pubmed && (nl = buf.indexOf('\n')) !== -1) {
+            var line = buf.slice(0, nl); buf = buf.slice(nl + 1);
+            if (!line.trim()) continue;
+            consider(JSON.parse(line), scanned++);
+          }
+          S.progress.select_pubmed = picked.length + '/' + N.pubmed + ' (scanned ' + scanned + ')';
+          if (picked.length >= N.pubmed) { try { ctrl.abort(); } catch (e) { /* done */ } return; }
+          return pump();
+        });
+      }
+      return pump();
+    }).then(function () {
+      S.data.pubmedInfo = { file: 'licensed_pubmed-0000.json.gz', scanned: scanned, rejected: rejected, selected: picked.length };
+      return picked;
+    });
   }
   function selectQA() {
     var picked = [], scanned = 0, offset = 0;
