@@ -318,7 +318,15 @@ home_css = """
 .me-foot a{color:var(--cyan,#7be2f0);font-weight:700;text-decoration:none}
 .me-foot a:hover{text-decoration:underline}
 .me-foot a:focus-visible{outline:3px solid #95eaff;outline-offset:2px;border-radius:4px}
+.me-log{margin-top:18px;padding:18px;border:1px solid #2b4360;border-radius:16px;background:linear-gradient(140deg,#152a43,#0e1c31 90%)}
+.me-log-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:6px 16px;margin:0 0 12px}
+.me-log-head h3{margin:0;font-size:17px}
+.me-log-head a{font-size:12.5px;font-weight:700;color:#7be2f0;text-decoration:none}
+.me-log-head a:hover{text-decoration:underline}
+.me-log iframe{display:block;width:100%;height:1110px;border:1px solid #2b4361;border-radius:12px;background:#0b1628}
 @media(max-width:980px){.me-cards{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:820px){.me-log iframe{height:1900px}}
+@media(max-width:600px){.me-log{padding:12px}}
 """
 tl = TINY['tinyStoriesValidation']
 home_section = f"""<!-- model-eval:start -->
@@ -332,7 +340,9 @@ home_section = f"""<!-- model-eval:start -->
 <article class="me-model"><div class="me-model-top"><span>GPT-2 style</span><span>1.06M</span></div><h3>Tiny GPT (TinyStories)</h3><p class="me-size">TinyStories validation ({tl['items']} stories)</p><p class="me-big"><b>{ppl(tl['perplexity'])}</b><span>perplexity</span></p>
 <ul><li>95% interval<strong>{ci(tl['ci95'])}</strong></li><li>Model card (PyTorch)<strong>{ppl(math.exp(TINY['modelCardValidationLoss']))} ✓ matches</strong></li><li>Browser speed<strong>{TINY['decodeTokensPerSec']:.0f} tokens/s</strong></li></ul></article>
 </div>
-<p class="me-foot"><a href="https://su394611-del.github.io/Mixtral-Healthcare-LLM-From-Scratch/#evaluation">Full results and method ↗</a><a href="https://su394611-del.github.io/Mixtral-Healthcare-LLM-From-Scratch/eval/results.json">results.json</a><a href="/playground/">Run the models yourself</a><a href="/training-logs/tiny-gpt/">Tiny GPT training log</a><span>Research models: not for medical advice.</span></p>
+<div class="me-log"><div class="me-log-head"><h3>Tiny GPT training log</h3><a href="/training-logs/tiny-gpt/" target="_blank" rel="noopener noreferrer">Open the full page ↗</a></div>
+<iframe class="me-iframe" src="/training-logs/tiny-gpt/" title="Tiny GPT training log" loading="lazy"></iframe></div>
+<p class="me-foot"><a href="https://su394611-del.github.io/Mixtral-Healthcare-LLM-From-Scratch/#evaluation">Full results and method ↗</a><a href="https://su394611-del.github.io/Mixtral-Healthcare-LLM-From-Scratch/eval/results.json">results.json</a><a href="/playground/">Run the models yourself</a><span>Research models: not for medical advice.</span></p>
 </section>
 <!-- model-eval:end -->"""
 
@@ -343,6 +353,17 @@ hp = (HOME / 'index.html').read_text()
 hp = put_between(hp, home_section, '<section aria-labelledby="engineering-notes-heading"')
 hp = re.sub(r'<style id="model-eval-styles">.*?</style>\n?', '', hp, flags=re.S)
 hp = hp.replace('</head>', '<style id="model-eval-styles">' + home_css.strip() + '</style>\n</head>', 1)
+hp = re.sub(r'<script id="tiny-log-embed">.*?</script>\n?', '', hp, flags=re.S)
+hp = hp.replace('</body>', '''<script id="tiny-log-embed">
+  // Size the Tiny GPT training-log iframe to its content (same-origin message from the framed page).
+  window.addEventListener('message', function (e) {
+    if (e.origin !== location.origin || !e.data || e.data.type !== 'tiny-gpt-log-height') return;
+    document.querySelectorAll('iframe.me-iframe').forEach(function (f) {
+      if (f.contentWindow === e.source) f.style.height = Math.ceil(e.data.height) + 'px';
+    });
+  });
+</script>
+</body>''', 1)
 (HOME / 'index.html').write_text(hp)
 readme = MIX / 'eval' / 'README.md'
 summary = f"""<!-- results:start -->
