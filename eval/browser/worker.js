@@ -150,30 +150,22 @@ var EV = (function () {
     return load(job.repo, job.sha, job.kind).then(function (m) {
       var res = { task: job.task, repo: job.repo, sha: job.sha, items: [] };
       var t0 = Date.now();
-      return new Promise(function (resolve, reject) {
-        var i = 0;
-        route = (job.task === 'pubmed' || job.task === 'qa') ? newRoute(m) : null;
-        function next() {
-          try {
-            var stop = Date.now() + 200;
-            while (i < job.items.length && Date.now() < stop) {
-              var it = job.items[i], r;
-              if (job.task === 'pubmed') r = scoreSeq(m, pubmedIds(m, it.text), 1);
-              else if (job.task === 'tiny') r = scoreSeq(m, m.tok.encode(it.text).slice(0, SEQ), 1);
-              else if (job.task === 'qa') { var ex = sftExample(m, it.q, it.a); r = scoreSeq(m, ex.ids, ex.scoreFrom); r.questionCut = ex.questionCut; }
-              else if (job.task === 'mcq') r = mcqItem(m, it);
-              else if (job.task === 'gen') { r = greedy(m, it.text, job.maxNew || 60, !!it.sft); r.id = it.id; }
-              else if (job.task === 'speed') r = { tokPerSec: speed(m, it.n || 64) };
-              res.items.push(r);
-              i++;
-            }
-            if (progress) progress(i, job.items.length);
-            if (i < job.items.length) setTimeout(next, 0);
-            else { res.route = route; res.seconds = (Date.now() - t0) / 1000; route = null; resolve(res); }
-          } catch (e) { reject(e); }
-        }
-        next();
-      });
+      // A plain loop: the worker owns its thread, and timers in a hidden page's workers can be
+      // throttled to about one per minute, so the loop never yields to setTimeout.
+      route = (job.task === 'pubmed' || job.task === 'qa') ? newRoute(m) : null;
+      for (var i = 0; i < job.items.length; i++) {
+        var it = job.items[i], r;
+        if (job.task === 'pubmed') r = scoreSeq(m, pubmedIds(m, it.text), 1);
+        else if (job.task === 'tiny') r = scoreSeq(m, m.tok.encode(it.text).slice(0, SEQ), 1);
+        else if (job.task === 'qa') { var ex = sftExample(m, it.q, it.a); r = scoreSeq(m, ex.ids, ex.scoreFrom); r.questionCut = ex.questionCut; }
+        else if (job.task === 'mcq') r = mcqItem(m, it);
+        else if (job.task === 'gen') { r = greedy(m, it.text, job.maxNew || 60, !!it.sft); r.id = it.id; }
+        else if (job.task === 'speed') r = { tokPerSec: speed(m, it.n || 64) };
+        res.items.push(r);
+        if (progress) progress(i + 1, job.items.length);
+      }
+      res.route = route; res.seconds = (Date.now() - t0) / 1000; route = null;
+      return res;
     });
   }
 
