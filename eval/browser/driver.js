@@ -13,10 +13,16 @@
   var S = window.__EVAL = { status: 'starting', log: [], progress: {}, data: {}, raw: {}, started: new Date().toISOString() };
   function log(m) { S.log.push(new Date().toISOString().slice(11, 19) + ' ' + m); }
 
-  function getJSON(url, tries) {
-    tries = tries || 4;
+  // The datasets server drops some large responses or rate-limits; back off and retry (2s, 4s, ... 30s).
+  function getJSON(url, attempt) {
+    attempt = attempt || 0;
     return fetch(url).then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
-      .catch(function (e) { if (tries <= 1) throw e; return new Promise(function (res) { setTimeout(res, 1500); }).then(function () { return getJSON(url, tries - 1); }); });
+      .catch(function (e) {
+        if (attempt >= 9) throw e;
+        S.retries = (S.retries || 0) + 1;
+        return new Promise(function (res) { setTimeout(res, Math.min(30000, 2000 * Math.pow(2, attempt))); })
+          .then(function () { return getJSON(url, attempt + 1); });
+      });
   }
   function rows(ds, cfg, split, offset, length) {
     return getJSON('https://datasets-server.huggingface.co/rows?dataset=' + encodeURIComponent(ds) + '&config=' + cfg + '&split=' + split + '&offset=' + offset + '&length=' + length)
@@ -35,17 +41,20 @@
     return /creativecommons\.org\/licenses\/by\/(?:2\.0|3\.0|4\.0)(?:\/|$)/.test(s);
   }
 
+  // Resumable: progress survives a failed run (window.__EVAL_CACHE); pages are consumed in dataset order.
   function selectPubmed() {
-    var picked = [], scanned = 0, page = 20, offset = 0, rejected = { license: 0, clinical: 0, train: 0 };
+    var C = window.__EVAL_CACHE = window.__EVAL_CACHE || {};
+    var st = C.pubmed = C.pubmed || { picked: [], scanned: 0, offset: 0, rejected: { license: 0, clinical: 0, train: 0 } };
+    var picked = st.picked, rejected = st.rejected, page = 10, par = 4;
     function batch() {
       var reqs = [];
-      for (var k = 0; k < 6; k++) reqs.push(rows('common-pile/pubmed_filtered', 'default', 'train', offset + k * page, page));
-      offset += 6 * page;
+      for (var k = 0; k < par; k++) reqs.push(rows('common-pile/pubmed_filtered', 'default', 'train', st.offset + k * page, page));
       return Promise.all(reqs).then(function (pages) {
+        st.offset += par * page;
         pages.forEach(function (p) {
           p.forEach(function (x) {
             if (picked.length >= N.pubmed) return;
-            scanned++;
+            st.scanned++;
             var t = x.row.text, md = x.row.metadata || {};
             if (typeof t !== 'string' || !t.trim()) return;
             if (!medicalFilter(t)) { rejected.clinical++; return; }
@@ -54,9 +63,9 @@
             picked.push({ idx: x.idx, id: x.row.id, text: t.slice(0, 4000) });
           });
         });
-        S.progress.select_pubmed = picked.length + '/' + N.pubmed + ' (scanned ' + scanned + ')';
-        if (picked.length < N.pubmed && offset < 160000) return batch();
-        S.data.pubmedInfo = { scanned: scanned, rejected: rejected, selected: picked.length };
+        S.progress.select_pubmed = picked.length + '/' + N.pubmed + ' (scanned ' + st.scanned + ')';
+        if (picked.length < N.pubmed && st.offset < 160000) return batch();
+        S.data.pubmedInfo = { scanned: st.scanned, rejected: rejected, selected: picked.length };
         return picked;
       });
     }
