@@ -11,7 +11,7 @@ flowchart TB
 
     subgraph PRETRAIN["Stage 1 · Healthcare-only pretraining"]
       PACK["Stream, partition and pack<br/>128-token training sequences"]
-      INIT["Initialize native Mixtral-style MoE<br/>with random model weights"]
+      INIT["Initialize native MedSparse MoE<br/>with random model weights"]
       CE["Causal next-token CE<br/>plus MoE balancing loss"]
       ADAM["AdamW updates all parameters<br/>5,000 optimizer steps"]
       CK1[("Pretraining checkpoint: last.pt")]

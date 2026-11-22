@@ -1,4 +1,4 @@
-"""Static SVG training charts for the Mixtral project page (no JavaScript needed).
+"""Static SVG training charts for the MedSparse Healthcare project page (no JavaScript needed).
 
 stage_chart(results)  -> held-out loss at each published checkpoint (always available).
 step_chart(dir)       -> per-step training curve, only when real metrics files exist:

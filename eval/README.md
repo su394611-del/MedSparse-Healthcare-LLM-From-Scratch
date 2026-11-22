@@ -1,8 +1,8 @@
 # Evaluation
 
 Held-out evaluation of the two published checkpoints
-([pretrained](https://huggingface.co/sudhanshu42844/mixtral-healthcare-pretrained-from-scratch),
-[medical SFT](https://huggingface.co/sudhanshu42844/mixtral-healthcare-medical-sft)) and the
+([pretrained](https://huggingface.co/sudhanshu42844/medsparse-healthcare-pretrained-from-scratch),
+[medical SFT](https://huggingface.co/sudhanshu42844/medsparse-healthcare-medical-sft)) and the
 [Tiny GPT](https://huggingface.co/sudhanshu42844/my-tiny-llm), run in a web browser on the same JavaScript
 engine as the [Model Playground](https://su394611-del.github.io/playground/).
 
@@ -53,7 +53,7 @@ and was checked against Python's `hashlib` on 308 strings, Unicode edge cases in
 2. Open the developer console and run:
 
 ```js
-const base = 'https://raw.githubusercontent.com/su394611-del/Mixtral-Healthcare-LLM-From-Scratch/main/eval/browser/';
+const base = 'https://raw.githubusercontent.com/su394611-del/MedSparse-Healthcare-LLM-From-Scratch/main/eval/browser/';
 const src = async f => (await fetch(base + f)).text();
 window.Split = new Function((await src('split.js')) + '\nreturn Split;')();
 window.aggregateEval = new Function((await src('aggregate.js')) + '\nreturn aggregateEval;')();

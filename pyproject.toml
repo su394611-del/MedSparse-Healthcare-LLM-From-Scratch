@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "mixtral-healthcare-from-scratch"
 version = "0.1.0"
-description = "Healthcare-only from-scratch Mixtral pretraining and full-parameter medical SFT"
+description = "MedSparse Healthcare: healthcare-only from-scratch sparse MoE pretraining and full-parameter medical SFT"
 requires-python = ">=3.10"
 dependencies = ["torch>=2.6,<3", "datasets>=3.0,<5", "tokenizers>=0.20,<1", "huggingface-hub>=0.28,<2"]
 

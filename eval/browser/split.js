@@ -1,5 +1,5 @@
 /*
- * Held-out split helpers for the Mixtral Healthcare evaluation.
+ * Held-out split helpers for the MedSparse Healthcare evaluation.
  * Re-implements, in JavaScript, the deterministic splits used at training time:
  *   mixtral_lab/healthcare_corpus.py  row_id() + stable_partition()   (pretraining, 2% validation)
  *   mixtral_lab/medical_data.py       bucket_for_question()            (SFT, 5% validation)

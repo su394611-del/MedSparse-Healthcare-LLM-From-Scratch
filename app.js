@@ -1,4 +1,4 @@
-/* Mixtral Healthcare project site: Vue 3 navigation and Mermaid diagram explorer.
+/* MedSparse Healthcare project site: Vue 3 navigation and Mermaid diagram explorer.
    All essential links and descriptions are static HTML for indexing and
    keyboard accessibility. Diagrams have downloadable, local .mmd sources. */
 (() => {
