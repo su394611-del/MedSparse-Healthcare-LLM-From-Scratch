@@ -1,4 +1,4 @@
-"""Render results.json into the Mixtral project page and the portfolio home page.
+"""Render results.json into the Mixtral project page and the AI Lab home page.
 
 Idempotent: content lives between <!-- model-eval:start --> / <!-- model-eval:end --> markers.
 Usage: python3 eval/build_pages.py eval/results.json [path/to/su394611-del.github.io]
@@ -231,7 +231,7 @@ mix_section = f"""<!-- model-eval:start -->
       {train_card}
       <article class="me-train me-embed" aria-labelledby="tiny-log-title">
         <h3 id="tiny-log-title">Tiny GPT training log</h3>
-        <p>The portfolio's other from-scratch model, a 1.06M-parameter GPT-2-style model trained on TinyStories, shown in its own frame. <a href="https://su394611-del.github.io/training-logs/tiny-gpt/" target="_blank" rel="noopener noreferrer">Open the full page ↗</a></p>
+        <p>The AI Lab's other from-scratch model, a 1.06M-parameter GPT-2-style model trained on TinyStories, shown in its own frame. <a href="https://su394611-del.github.io/training-logs/tiny-gpt/" target="_blank" rel="noopener noreferrer">Open the full page ↗</a></p>
         <iframe class="me-iframe" src="/training-logs/tiny-gpt/" title="Tiny GPT training log" loading="lazy"></iframe>
       </article>
       <div class="me-grid">
@@ -294,7 +294,7 @@ page = page.replace('class="kicker">04 / ARCHITECTURE', 'class="kicker">05 / ARC
 if Path(sys.argv[1]).resolve() != (MIX / 'eval' / 'results.json').resolve():
     shutil.copy(sys.argv[1], MIX / 'eval' / 'results.json')
 
-# ------------------------------------------------------------------ portfolio home page
+# ------------------------------------------------------------------ AI Lab home page
 home_css = """
 /* Model evaluation summary (generated from the Mixtral repo's eval/results.json) */
 .model-eval{padding-top:84px}
