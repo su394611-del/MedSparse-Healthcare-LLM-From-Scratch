@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" role="img" aria-labelledby="title">
-  <title id="title">Mixtral Healthcare LLM</title>
+  <title id="title">MedSparse Healthcare LLM</title>
   <defs>
     <linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#6de2ea"/><stop offset="1" stop-color="#a39cff"/></linearGradient>
   </defs>

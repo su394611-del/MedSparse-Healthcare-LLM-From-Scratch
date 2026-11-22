@@ -1,5 +1,8 @@
-# Healthcare-only Mixtral: pretrain FROM SCRATCH, then FULL fine-tune
-This repository extends the original PyTorch **native, randomly initialized Mixtral-style sparse-MoE architecture**. Its intended sequence is:
+# MedSparse Healthcare: pretrain FROM SCRATCH, then FULL fine-tune
+
+*MedSparse Healthcare (formerly Mixtral Healthcare) is a custom sparse Mixture-of-Experts language model with a Mixtral-inspired architecture. It does not use or distribute official Mistral AI or Mixtral weights.*
+
+This repository extends the original PyTorch **native, randomly initialized sparse-MoE architecture (Mixtral-inspired)**. Its intended sequence is:
 
 1. **Build a tokenizer only on biomedical / healthcare publications from Hugging Face.**
 2. **Stage 1 — pretrain every model weight from RANDOM INITIALIZATION** on an auditable healthcare text corpus with standard next-token loss and auxiliary MoE load-balancing loss. **No Mistral/Mixtral pretrained weights are downloaded or used.**
@@ -49,7 +52,7 @@ python -m scripts.train_healthcare_tokenizer \
 
 **Verify the printed ACTUAL tokenizer vocabulary size is precisely `32000`.** If not, change `vocab_size` in the model config to match *before Stage 1*. Keep the same tokenizer for both stages; mismatched token IDs or changing vocabulary will invalidate the Stage 1 model.
 
-### Stage 1 — pretrain 1.08B Mixtral-style MoE from random initialization
+### Stage 1 — pretrain the 1.08B MedSparse MoE from random initialization
 
 Example **8×CUDA GPU cluster** command; only a template and not benchmarked at full scale:
 

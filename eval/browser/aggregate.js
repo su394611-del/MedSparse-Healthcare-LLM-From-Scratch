@@ -63,8 +63,8 @@ function aggregateEval(S) {
     generated: S.finished, harnessCommit: window.__EV_COMMIT || null,
     environment: { browser: (navigator.userAgentData && navigator.userAgentData.brands || []).map(function (b) { return b.brand + ' ' + b.version; }).join(', ') || navigator.userAgent, cpuThreads: navigator.hardwareConcurrency, engine: 'Model Playground JavaScript engine (float32, CPU, Web Worker)' },
     models: {
-      pretrained: { repo: 'sudhanshu42844/mixtral-healthcare-pretrained-from-scratch', revision: S.shas.pre, parameters: 38779008 },
-      sft: { repo: 'sudhanshu42844/mixtral-healthcare-medical-sft', revision: S.shas.sft, parameters: 38779008 },
+      pretrained: { repo: 'sudhanshu42844/medsparse-healthcare-pretrained-from-scratch', revision: S.shas.pre, parameters: 38779008 },
+      sft: { repo: 'sudhanshu42844/medsparse-healthcare-medical-sft', revision: S.shas.sft, parameters: 38779008 },
       tiny: { repo: 'sudhanshu42844/my-tiny-llm', revision: S.shas.tiny, parameters: 1060992 }
     },
     data: {

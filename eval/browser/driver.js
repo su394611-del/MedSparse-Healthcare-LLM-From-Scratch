@@ -6,8 +6,8 @@
   'use strict';
   var N = { pubmed: 40, qa: 80, mcq: 150, tiny: 100 };
   var REPOS = {
-    pre: { repo: 'sudhanshu42844/mixtral-healthcare-pretrained-from-scratch', kind: 'mixtral' },
-    sft: { repo: 'sudhanshu42844/mixtral-healthcare-medical-sft', kind: 'mixtral' },
+    pre: { repo: 'sudhanshu42844/medsparse-healthcare-pretrained-from-scratch', kind: 'mixtral' },
+    sft: { repo: 'sudhanshu42844/medsparse-healthcare-medical-sft', kind: 'mixtral' },
     tiny: { repo: 'sudhanshu42844/my-tiny-llm', kind: 'gpt2' }
   };
   var S = window.__EVAL = { status: 'starting', log: [], progress: {}, data: {}, raw: {}, started: new Date().toISOString() };

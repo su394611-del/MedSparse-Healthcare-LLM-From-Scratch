@@ -8,12 +8,12 @@
   },
   "models": {
     "pretrained": {
-      "repo": "sudhanshu42844/mixtral-healthcare-pretrained-from-scratch",
+      "repo": "sudhanshu42844/medsparse-healthcare-pretrained-from-scratch",
       "revision": "bb8e91ae0852a2f9b2bb5ac3dbb5f94c56e28059",
       "parameters": 38779008
     },
     "sft": {
-      "repo": "sudhanshu42844/mixtral-healthcare-medical-sft",
+      "repo": "sudhanshu42844/medsparse-healthcare-medical-sft",
       "revision": "0a157beb679a202c1b5a3db4951cdeba941851c7",
       "parameters": 38779008
     },

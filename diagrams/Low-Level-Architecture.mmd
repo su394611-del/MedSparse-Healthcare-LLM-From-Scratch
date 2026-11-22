@@ -3,7 +3,7 @@ flowchart TB
     EMB["Token embedding<br/>vocabulary 30,001 · hidden size 384"]
     IDS --> EMB
 
-    subgraph DECODER["Mixtral-style Transformer decoder · 4 sequential blocks"]
+    subgraph DECODER["MedSparse Transformer decoder · 4 sequential blocks"]
       direction TB
       X["Block input · hidden states"]
       RN1["RMSNorm"]
