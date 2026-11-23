@@ -1,7 +1,7 @@
 """Build /training-logs/tiny-gpt/index.html: Tiny GPT training log, designed to sit in an iframe.
 
 Sources (all real):
-  model card (README) of sudhanshu42844/my-tiny-llm: per-epoch train/val loss, 270/30 split, 2 epochs, GTX 1650
+  model card (README) of sudhanshu42844/my-tiny-llm: per-epoch train/val loss, 270/30 split, 2 epochs on a consumer-grade GPU
   config.json of the same repo: GPT-2 style, 3 layers, 4 heads, 128 hidden, 128 context, vocab 3,512
   transformer_hf_dataset_and_llm.py (run_generate_llm): logs one averaged line per epoch; defaults
   eval/results.json: browser re-measurement on TinyStories validation stories
@@ -124,7 +124,7 @@ page = f"""<!DOCTYPE html>
   <p class="lede">Every value the training program logged for the published checkpoint. The program writes one averaged line per epoch, so this run has two logged points per curve.</p>
   <ul class="facts">
     <li><b>1,060,992</b> parameters</li><li><b>3</b> layers · <b>4</b> heads · <b>128</b> hidden</li><li><b>128</b>-token context</li>
-    <li><b>3,512</b>-token BPE vocabulary</li><li><b>270</b> train / <b>30</b> validation stories</li><li><b>2</b> epochs on a GTX 1650 (4 GB)</li>
+    <li><b>3,512</b>-token BPE vocabulary</li><li><b>270</b> train / <b>30</b> validation stories</li><li><b>2</b> epochs on a consumer-grade GPU</li>
   </ul>
   <div class="grid">
     <section class="panel" aria-label="Loss per epoch">
