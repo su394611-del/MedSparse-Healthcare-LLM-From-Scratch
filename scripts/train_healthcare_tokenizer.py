@@ -33,7 +33,7 @@ def main(argv=None):
         dataset_config=a.dataset_config, split=a.split, local_jsonl=a.local_jsonl,
         partition="train", require_license=not a.allow_unknown_license,
         min_clinical_hits=a.min_clinical_hits), a.sample_docs)
-    tokenizer.train_from_iterator(iterator)
+    tokenizer.train_from_iterator(iterator, trainer=trainer)
     Path(a.output).parent.mkdir(parents=True, exist_ok=True)
     tokenizer.save(a.output)
     print(f"Healthcare tokenizer saved: {a.output}. ACTUAL vocabulary size: {tokenizer.get_vocab_size()}")
