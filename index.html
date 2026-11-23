@@ -138,7 +138,7 @@
         <a href="#overview">Overview</a>
         <a href="#architecture">Architecture</a>
         <a href="#training">Training</a>
-        <a href="#models">Models</a> <a href="#evaluation">Evaluation</a> <a href="#report">Report</a>
+        <a href="#models">Models</a> <a href="#evaluation">Evaluation</a> <a href="#report" data-open-report>Report</a>
         <a href="#resources">Documentation</a>
       </div>
       <div class="nav-right">
@@ -153,7 +153,7 @@
       <a href="#overview" @click="menuOpen=false">Overview</a>
       <a href="#architecture" @click="menuOpen=false">Architecture</a>
       <a href="#training" @click="menuOpen=false">Training</a>
-      <a href="#models" @click="menuOpen=false">Models</a><a href="#evaluation" @click="menuOpen=false">Evaluation</a><a href="#report" @click="menuOpen=false">Technical report</a>
+      <a href="#models" @click="menuOpen=false">Models</a><a href="#evaluation" @click="menuOpen=false">Evaluation</a><a href="#report" data-open-report @click="menuOpen=false">Technical report</a>
       <a href="#resources" @click="menuOpen=false">Documentation</a>
       <a href="https://su394611-del.github.io/">AI Lab home</a>
     </div>
@@ -169,7 +169,7 @@
         <div class="hero-actions">
           <a class="button primary" href="#models">Explore both models <span aria-hidden="true">↗</span></a>
           <a class="button secondary" href="https://github.com/su394611-del/MedSparse-Healthcare-LLM-From-Scratch" target="_blank" rel="noopener noreferrer">Browse source code <span aria-hidden="true">↗</span></a>
-          <a class="button secondary" href="https://su394611-del.github.io/research/medsparse-healthcare-2026/">Read the technical report</a>
+          <a class="button secondary report-toggle" href="https://su394611-del.github.io/research/medsparse-healthcare-2026/" data-open-report aria-controls="report" aria-expanded="false">Read the technical report <span class="report-caret" aria-hidden="true">▾</span></a>
         </div>
         <a class="release-notice" href="#next-release"><span class="release-badge">NEXT RELEASE</span><span><time datetime="2026-11-25">Wednesday, 25 Nov 2026</time> · full MIRIAD fine-tune, after final testing</span></a>
         <div class="hero-meta"><span class="inline-dot"></span> Native PyTorch implementation <span class="sep">•</span> Healthcare-only pretraining inputs <span class="sep">•</span> Fully trainable model</div>
@@ -189,6 +189,12 @@
       </div>
     </section>
 
+    <section class="container report-panel" id="report" aria-labelledby="report-panel-title" hidden v-pre>
+      <div class="report-embed">
+        <div class="report-embed-head"><h2 id="report-panel-title">Technical report <span>· Version 0.9 · 23 Nov 2026</span></h2><div class="report-embed-actions"><a href="https://su394611-del.github.io/research/medsparse-healthcare-2026/">Open the full page ↗</a><button class="report-close" type="button" data-close-report>Close <span aria-hidden="true">✕</span></button></div></div>
+        <iframe class="report-iframe" id="ss-report-frame" data-src="https://su394611-del.github.io/research/embed/" title="MedSparse Healthcare technical report"></iframe>
+      </div>
+    </section>
     <section class="metrics container" aria-label="Reference model and training specifications">
       <div class="metric"><strong>38.8<span>M</span></strong><p>Model parameters<br><small>Reference trained configuration</small></p></div>
       <div class="metric"><strong>04<span> / 02</span></strong><p>Available experts / top-k<br><small>Sparse routing per token</small></p></div>
@@ -370,16 +376,8 @@ The authors declare that the study of the study, the study is a role of the manu
     </section>
     <!-- model-eval:end -->
 
-    <section class="section container" id="report" aria-labelledby="report-title" v-pre>
-      <div class="section-intro"><div><p class="kicker">05 / TECHNICAL REPORT</p><h2 id="report-title">The full write-up, <span class="gradient-text">with the evidence.</span></h2></div><p>Architecture, data, all three training stages and the held-out evaluation in one 7-page technical report, with the PDF, LaTeX source and citation.</p></div>
-      <div class="report-embed">
-        <iframe class="report-iframe" id="ss-report-frame" src="https://su394611-del.github.io/research/embed/" title="MedSparse Healthcare technical report" loading="lazy"></iframe>
-        <p class="report-embed-foot"><a href="https://su394611-del.github.io/research/medsparse-healthcare-2026/">Open the full report page ↗</a><a href="https://su394611-del.github.io/research/">All research reports</a></p>
-      </div>
-    </section>
-
     <section class="section section-banded" id="architecture" aria-labelledby="architecture-title"><div class="container">
-      <div class="section-intro"><div><p class="kicker">06 / ARCHITECTURE &amp; DESIGN</p><h2 id="architecture-title">Architecture you can <span class="gradient-text">inspect.</span></h2></div><p>Switch between high-level architecture, decoder internals, and the checkpoint lifecycle. Diagrams use editable Mermaid.js source.</p></div>
+      <div class="section-intro"><div><p class="kicker">05 / ARCHITECTURE &amp; DESIGN</p><h2 id="architecture-title">Architecture you can <span class="gradient-text">inspect.</span></h2></div><p>Switch between high-level architecture, decoder internals, and the checkpoint lifecycle. Diagrams use editable Mermaid.js source.</p></div>
       <div class="diagram-panel"><div class="diagram-toolbar"><div class="diagram-tabs" role="tablist" aria-label="Architecture diagrams">
         <button type="button" role="tab" data-diagram="hld" aria-selected="true" :aria-selected="String(activeDiagram === 'hld')" :class="{'active':activeDiagram === 'hld'}" @click="selectDiagram('hld')">High-level design</button>
         <button type="button" role="tab" data-diagram="lld" aria-selected="false" :aria-selected="String(activeDiagram === 'lld')" :class="{'active':activeDiagram === 'lld'}" @click="selectDiagram('lld')">Low-level design</button>
@@ -393,7 +391,7 @@ The authors declare that the study of the study, the study is a role of the manu
     </div></section>
 
     <section class="section container" id="resources" aria-labelledby="resources-title">
-      <div class="section-intro"><div><p class="kicker">07 / DOCUMENTATION DIRECTORY</p><h2 id="resources-title">From visual design <span class="gradient-text">to source code.</span></h2></div><p>Use the implementation, README, GitHub Wiki and editable diagrams to follow or reproduce the training workflow.</p></div>
+      <div class="section-intro"><div><p class="kicker">06 / DOCUMENTATION DIRECTORY</p><h2 id="resources-title">From visual design <span class="gradient-text">to source code.</span></h2></div><p>Use the implementation, README, GitHub Wiki and editable diagrams to follow or reproduce the training workflow.</p></div>
       <div class="resources-grid">
         <a class="resource-card" href="https://github.com/su394611-del/MedSparse-Healthcare-LLM-From-Scratch" target="_blank" rel="noopener noreferrer"><span class="resource-icon">&lt;/&gt;</span><span><strong>GitHub repository</strong><small>Source code, tests, configurations and scripts</small></span><span class="resource-arrow">↗</span></a>
         <a class="resource-card" href="https://github.com/su394611-del/MedSparse-Healthcare-LLM-From-Scratch/blob/main/README.md" target="_blank" rel="noopener noreferrer"><span class="resource-icon">▤</span><span><strong>README.md</strong><small>Setup, architecture, datasets and training commands</small></span><span class="resource-arrow">↗</span></a>
@@ -423,6 +421,32 @@ The authors declare that the study of the study, the study is a role of the manu
 (function(){window.addEventListener('message',function(e){if(e.origin!==window.location.origin)return;var d=e.data;if(!d||d.type!=='playground-frame:height')return;var f=document.getElementById('ss-try-frame');if(!f||e.source!==f.contentWindow)return;var h=Math.ceil(Number(d.height));if(h>0&&h<5000)f.style.height=h+'px';});})();
 </script>
 <script src="/assets/privacy.js" defer></script>
+<script id="report-panel-js">
+  // "Read the technical report" opens the embedded report just below the hero.
+  (function () {
+    function panel() { return document.getElementById('report'); }
+    function setExpanded(v) { document.querySelectorAll('.report-toggle').forEach(function (b) { b.setAttribute('aria-expanded', String(v)); }); }
+    function open(scroll) {
+      var p = panel(); if (!p) return false;
+      var f = p.querySelector('iframe'); if (f && !f.getAttribute('src')) f.setAttribute('src', f.getAttribute('data-src'));
+      p.hidden = false; setExpanded(true);
+      if (scroll) { var smooth = !window.matchMedia('(prefers-reduced-motion: reduce)').matches; p.scrollIntoView({ behavior: smooth ? 'smooth' : 'auto', block: 'start' }); }
+      return true;
+    }
+    function close() { var p = panel(); if (!p) return; p.hidden = true; setExpanded(false); var b = document.querySelector('.report-toggle'); if (b) b.focus(); }
+    document.addEventListener('click', function (e) {
+      if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      var t = e.target.closest && e.target.closest('[data-open-report], [data-close-report]');
+      if (!t) return;
+      if (t.hasAttribute('data-close-report')) { close(); return; }
+      if (t.classList.contains('report-toggle') && !panel().hidden) { e.preventDefault(); close(); return; }
+      if (open(true)) e.preventDefault();
+    });
+    function fromHash() { if (location.hash === '#report') open(true); }
+    window.addEventListener('hashchange', fromHash);
+    window.addEventListener('load', fromHash);
+  })();
+</script>
 <script id="tiny-log-embed">
   // Size the embedded training-log and technical-report iframes to their content (same-origin messages from the framed pages).
   window.addEventListener('message', function (e) {
