@@ -14,7 +14,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import training_chart  # noqa: E402
 
-RES = json.load(open(sys.argv[1]))
+RES = json.loads(Path(sys.argv[1]).read_text(encoding='utf-8'))
 MIX = Path(__file__).resolve().parents[1]
 HOME = Path(sys.argv[2]) if len(sys.argv) > 2 else None
 R = RES['results']
@@ -270,7 +270,7 @@ def put_between(text, block, anchor_after):
     return text[:i] + block.strip() + '\n\n    ' + text[i:]
 
 
-page = (MIX / 'index.html').read_text()
+page = (MIX / 'index.html').read_text(encoding='utf-8')
 page = put_between(page, mix_section, '<section class="section section-banded" id="architecture"')
 page = re.sub(r'<style id="model-eval-styles">.*?</style>\n?', '', page, flags=re.S)   # exactly one copy
 page = page.replace('</head>', '<style id="model-eval-styles">' + mix_css.strip() + '</style>\n</head>', 1)
@@ -289,10 +289,31 @@ if 'href="#evaluation"' not in page:
     page = page.replace('<a href="#models">Models</a>', '<a href="#models">Models</a> <a href="#evaluation">Evaluation</a>', 1)
     page = page.replace('<a href="#models" @click="menuOpen=false">Models</a>', '<a href="#models" @click="menuOpen=false">Models</a><a href="#evaluation" @click="menuOpen=false">Evaluation</a>', 1)
 page = page.replace('class="kicker">04 / ARCHITECTURE', 'class="kicker">05 / ARCHITECTURE').replace('class="kicker">05 / DOCUMENTATION', 'class="kicker">06 / DOCUMENTATION')
-(MIX / 'index.html').write_text(page)
+(MIX / 'index.html').write_text(page, encoding='utf-8')
 (MIX / 'eval').mkdir(exist_ok=True)
 if Path(sys.argv[1]).resolve() != (MIX / 'eval' / 'results.json').resolve():
     shutil.copy(sys.argv[1], MIX / 'eval' / 'results.json')
+
+tl = TINY['tinyStoriesValidation']
+readme = MIX / 'eval' / 'README.md'
+summary = f"""<!-- results:start -->
+## Results ({date})
+
+| Metric | Pretrained | Medical SFT |
+|---|---|---|
+| PubMed held-out perplexity ({n['pubmed']['selected']} articles) | {ppl(PRE['pubmedHeldOut']['perplexity'])} ({ci(PRE['pubmedHeldOut']['ci95'])}) | {ppl(SFT['pubmedHeldOut']['perplexity'])} ({ci(SFT['pubmedHeldOut']['ci95'])}) |
+| Medical Q&A held-out perplexity ({n['qa']['selected']} answers) | {ppl(PRE['medicalQaHeldOut']['perplexity'])} ({ci(PRE['medicalQaHeldOut']['ci95'])}) | {ppl(SFT['medicalQaHeldOut']['perplexity'])} ({ci(SFT['medicalQaHeldOut']['ci95'])}) |
+| Next-token top-1 accuracy, PubMed / Q&A | {pc(PRE['pubmedHeldOut']['top1Accuracy'])} / {pc(PRE['medicalQaHeldOut']['top1Accuracy'])} | {pc(SFT['pubmedHeldOut']['top1Accuracy'])} / {pc(SFT['medicalQaHeldOut']['top1Accuracy'])} |
+| MedMCQA accuracy ({sm['items']} questions, chance 25%) | {pc(pm['accuracy'])} ({pc(pm['ci95'][0])}–{pc(pm['ci95'][1])}) | {pc(sm['accuracy'])} ({pc(sm['ci95'][0])}–{pc(sm['ci95'][1])}) |
+| Decode speed in the browser | {PRE['decodeTokensPerSec']:.1f} tokens/s | {SFT['decodeTokensPerSec']:.1f} tokens/s |
+
+Tiny GPT ([my-tiny-llm](https://huggingface.co/sudhanshu42844/my-tiny-llm)): TinyStories validation perplexity {ppl(tl['perplexity'])} ({ci(tl['ci95'])}) on {tl['items']} stories; {TINY['decodeTokensPerSec']:.0f} tokens/s.
+
+Brackets are 95% intervals (bootstrap over items for perplexity, Wilson for accuracy). Full numbers, row indices and sample generations: [`results.json`](results.json).
+<!-- results:end -->"""
+rt = readme.read_text(encoding='utf-8')
+rt = re.sub(r'<!-- results:start -->.*?<!-- results:end -->', lambda m: summary, rt, flags=re.S)
+readme.write_text(rt, encoding='utf-8')
 
 # ------------------------------------------------------------------ AI Lab home page
 home_css = """
@@ -328,7 +349,6 @@ home_css = """
 @media(max-width:820px){.me-log iframe{height:1900px}}
 @media(max-width:600px){.me-log{padding:12px}}
 """
-tl = TINY['tinyStoriesValidation']
 home_section = f"""<!-- model-eval:start -->
 <section aria-labelledby="model-eval-heading" class="layout model-eval" id="model-evaluation" v-pre>
 <div class="me-head"><div><p class="me-kicker">Model evaluation · {date}</p><h2 id="model-eval-heading">Three models, scored on held-out data.</h2></div><p>Measured in the browser with the same JavaScript engine as the <a href="/playground/" style="color:var(--cyan,#7be2f0)">Model Playground</a>, on text none of the models saw in training. Lower perplexity is better; it is not comparable across models with different tokenizers and data.</p></div>
@@ -349,7 +369,7 @@ home_section = f"""<!-- model-eval:start -->
 if HOME is None:
     print('home page skipped (no path given)')
     sys.exit(0)
-hp = (HOME / 'index.html').read_text()
+hp = (HOME / 'index.html').read_text(encoding='utf-8')
 hp = put_between(hp, home_section, '<section aria-labelledby="engineering-notes-heading"')
 hp = re.sub(r'<style id="model-eval-styles">.*?</style>\n?', '', hp, flags=re.S)
 hp = hp.replace('</head>', '<style id="model-eval-styles">' + home_css.strip() + '</style>\n</head>', 1)
@@ -364,24 +384,5 @@ hp = hp.replace('</body>', '''<script id="tiny-log-embed">
   });
 </script>
 </body>''', 1)
-(HOME / 'index.html').write_text(hp)
-readme = MIX / 'eval' / 'README.md'
-summary = f"""<!-- results:start -->
-## Results ({date})
-
-| Metric | Pretrained | Medical SFT |
-|---|---|---|
-| PubMed held-out perplexity ({n['pubmed']['selected']} articles) | {ppl(PRE['pubmedHeldOut']['perplexity'])} ({ci(PRE['pubmedHeldOut']['ci95'])}) | {ppl(SFT['pubmedHeldOut']['perplexity'])} ({ci(SFT['pubmedHeldOut']['ci95'])}) |
-| Medical Q&A held-out perplexity ({n['qa']['selected']} answers) | {ppl(PRE['medicalQaHeldOut']['perplexity'])} ({ci(PRE['medicalQaHeldOut']['ci95'])}) | {ppl(SFT['medicalQaHeldOut']['perplexity'])} ({ci(SFT['medicalQaHeldOut']['ci95'])}) |
-| Next-token top-1 accuracy, PubMed / Q&A | {pc(PRE['pubmedHeldOut']['top1Accuracy'])} / {pc(PRE['medicalQaHeldOut']['top1Accuracy'])} | {pc(SFT['pubmedHeldOut']['top1Accuracy'])} / {pc(SFT['medicalQaHeldOut']['top1Accuracy'])} |
-| MedMCQA accuracy ({sm['items']} questions, chance 25%) | {pc(pm['accuracy'])} ({pc(pm['ci95'][0])}–{pc(pm['ci95'][1])}) | {pc(sm['accuracy'])} ({pc(sm['ci95'][0])}–{pc(sm['ci95'][1])}) |
-| Decode speed in the browser | {PRE['decodeTokensPerSec']:.1f} tokens/s | {SFT['decodeTokensPerSec']:.1f} tokens/s |
-
-Tiny GPT ([my-tiny-llm](https://huggingface.co/sudhanshu42844/my-tiny-llm)): TinyStories validation perplexity {ppl(tl['perplexity'])} ({ci(tl['ci95'])}) on {tl['items']} stories; {TINY['decodeTokensPerSec']:.0f} tokens/s.
-
-Brackets are 95% intervals (bootstrap over items for perplexity, Wilson for accuracy). Full numbers, row indices and sample generations: [`results.json`](results.json).
-<!-- results:end -->"""
-rt = readme.read_text()
-rt = re.sub(r'<!-- results:start -->.*?<!-- results:end -->', lambda m: summary, rt, flags=re.S)
-readme.write_text(rt)
+(HOME / 'index.html').write_text(hp, encoding='utf-8')
 print('pages updated; QA change', round(qa_change, 3), 'sig', qa_sig, '| PubMed change', round(pm_change, 3), 'sig', pm_sig)
