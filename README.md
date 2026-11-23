@@ -2,6 +2,8 @@
 
 *MedSparse Healthcare (formerly Mixtral Healthcare) is a custom sparse Mixture-of-Experts language model with a Mixtral-inspired architecture. It does not use or distribute official Mistral AI or Mixtral weights.*
 
+**Released work:** the 38.8M-parameter [pretrained](https://huggingface.co/sudhanshu42844/medsparse-healthcare-pretrained-from-scratch) and [medical SFT](https://huggingface.co/sudhanshu42844/medsparse-healthcare-medical-sft) checkpoints on Hugging Face, the [technical report](https://su394611-del.github.io/research/medsparse-healthcare-2026/) (DOI [10.5281/zenodo.24461542](https://doi.org/10.5281/zenodo.24461542)), the [project site](https://su394611-del.github.io/MedSparse-Healthcare-LLM-From-Scratch/) with an in-browser playground, and the [engineering wiki](https://github.com/su394611-del/MedSparse-Healthcare-LLM-From-Scratch/wiki). Held-out results are in [`eval/results.json`](eval/results.json).
+
 This repository extends the original PyTorch **native, randomly initialized sparse-MoE architecture (Mixtral-inspired)**. Its intended sequence is:
 
 1. **Build a tokenizer only on biomedical / healthcare publications from Hugging Face.**
@@ -151,9 +153,9 @@ scripts/finetune_medical.py          STAGE 2 full SFT loading Stage 1 native che
 scripts/two_stage_smoke.py           Offline two-stage train/load/weight-change proof
 scripts/generate.py, evaluate.py     Text generation, general perplexity reference
 configs/healthcare_*.json           1B, 46.7B, million-position experimental presets
-data/synthetic_healthcare_corpus.jsonl  Synthetic data only for test
+data/                                Byte tokenizer and synthetic fixtures for the offline smoke test and unit tests
 ```
 
-**Status as packaged:** The small-model two-stage CPU smoke passed, and 16 automated tests passed. Live HF dataset loading, BPE tokenizer dependency, multi-GPU FSDP2 training, billion-parameter training, and full 1M context functionality have NOT been executed here. The container has no CUDA device, can't connect to Hugging Face, and lacks optional `tokenizers` until you install the requirements. This is a runnable, research-grade, production-grade training codebase.
+**Status as packaged:** The small-model two-stage CPU smoke passed, and the automated tests in `tests/` passed. Live HF dataset loading, BPE tokenizer dependency, multi-GPU FSDP2 training, billion-parameter training, and full 1M context functionality have NOT been executed here. The packaging environment had no CUDA device or Hugging Face access, and `tokenizers` is only available after you install the requirements. This is a runnable, research-grade training codebase, not production software.
 
-This project is licensed under the Apache License, Version 2.0.© 2026 Sudhanshu Shukla · Licensed under the Apache License, Version 2.0
+This project is licensed under the [Apache License, Version 2.0](LICENSE). © 2026 Sudhanshu Shukla.

@@ -1,0 +1,11 @@
+{
+  "type": "built_in_byte_tokenizer",
+  "vocab_size": 260,
+  "special_tokens": {
+    "<pad>": 0,
+    "<unk>": 1,
+    "<bos>": 2,
+    "<eos>": 3
+  },
+  "note": "Dependency-free byte tokenizer for the offline smoke test and unit tests only (mixtral_lab.data.ByteTokenizer)."
+}

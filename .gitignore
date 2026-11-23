@@ -23,9 +23,12 @@ checkpoints/
 *.pth
 *.ckpt
 
-# Downloaded datasets
+# Downloaded datasets (the small synthetic fixtures below are tracked)
 data/*
 !data/synthetic_healthcare_corpus.jsonl
+!data/medical_demo.jsonl
+!data/byte_tokenizer.json
+!data/demo.txt
 
 # Generated artifacts
 artifacts/*
