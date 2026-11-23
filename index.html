@@ -138,7 +138,7 @@
         <a href="#overview">Overview</a>
         <a href="#architecture">Architecture</a>
         <a href="#training">Training</a>
-        <a href="#models">Models</a> <a href="#evaluation">Evaluation</a>
+        <a href="#models">Models</a> <a href="#evaluation">Evaluation</a> <a href="#report">Report</a>
         <a href="#resources">Documentation</a>
       </div>
       <div class="nav-right">
@@ -153,7 +153,7 @@
       <a href="#overview" @click="menuOpen=false">Overview</a>
       <a href="#architecture" @click="menuOpen=false">Architecture</a>
       <a href="#training" @click="menuOpen=false">Training</a>
-      <a href="#models" @click="menuOpen=false">Models</a><a href="#evaluation" @click="menuOpen=false">Evaluation</a>
+      <a href="#models" @click="menuOpen=false">Models</a><a href="#evaluation" @click="menuOpen=false">Evaluation</a><a href="#report" @click="menuOpen=false">Technical report</a>
       <a href="#resources" @click="menuOpen=false">Documentation</a>
       <a href="https://su394611-del.github.io/">AI Lab home</a>
     </div>
@@ -370,8 +370,16 @@ The authors declare that the study of the study, the study is a role of the manu
     </section>
     <!-- model-eval:end -->
 
+    <section class="section container" id="report" aria-labelledby="report-title" v-pre>
+      <div class="section-intro"><div><p class="kicker">05 / TECHNICAL REPORT</p><h2 id="report-title">The full write-up, <span class="gradient-text">with the evidence.</span></h2></div><p>Architecture, data, all three training stages and the held-out evaluation in one 7-page technical report, with the PDF, LaTeX source and citation.</p></div>
+      <div class="report-embed">
+        <iframe class="report-iframe" id="ss-report-frame" src="https://su394611-del.github.io/research/embed/" title="MedSparse Healthcare technical report" loading="lazy"></iframe>
+        <p class="report-embed-foot"><a href="https://su394611-del.github.io/research/medsparse-healthcare-2026/">Open the full report page ↗</a><a href="https://su394611-del.github.io/research/">All research reports</a></p>
+      </div>
+    </section>
+
     <section class="section section-banded" id="architecture" aria-labelledby="architecture-title"><div class="container">
-      <div class="section-intro"><div><p class="kicker">05 / ARCHITECTURE &amp; DESIGN</p><h2 id="architecture-title">Architecture you can <span class="gradient-text">inspect.</span></h2></div><p>Switch between high-level architecture, decoder internals, and the checkpoint lifecycle. Diagrams use editable Mermaid.js source.</p></div>
+      <div class="section-intro"><div><p class="kicker">06 / ARCHITECTURE &amp; DESIGN</p><h2 id="architecture-title">Architecture you can <span class="gradient-text">inspect.</span></h2></div><p>Switch between high-level architecture, decoder internals, and the checkpoint lifecycle. Diagrams use editable Mermaid.js source.</p></div>
       <div class="diagram-panel"><div class="diagram-toolbar"><div class="diagram-tabs" role="tablist" aria-label="Architecture diagrams">
         <button type="button" role="tab" data-diagram="hld" aria-selected="true" :aria-selected="String(activeDiagram === 'hld')" :class="{'active':activeDiagram === 'hld'}" @click="selectDiagram('hld')">High-level design</button>
         <button type="button" role="tab" data-diagram="lld" aria-selected="false" :aria-selected="String(activeDiagram === 'lld')" :class="{'active':activeDiagram === 'lld'}" @click="selectDiagram('lld')">Low-level design</button>
@@ -385,7 +393,7 @@ The authors declare that the study of the study, the study is a role of the manu
     </div></section>
 
     <section class="section container" id="resources" aria-labelledby="resources-title">
-      <div class="section-intro"><div><p class="kicker">06 / DOCUMENTATION DIRECTORY</p><h2 id="resources-title">From visual design <span class="gradient-text">to source code.</span></h2></div><p>Use the implementation, README, GitHub Wiki and editable diagrams to follow or reproduce the training workflow.</p></div>
+      <div class="section-intro"><div><p class="kicker">07 / DOCUMENTATION DIRECTORY</p><h2 id="resources-title">From visual design <span class="gradient-text">to source code.</span></h2></div><p>Use the implementation, README, GitHub Wiki and editable diagrams to follow or reproduce the training workflow.</p></div>
       <div class="resources-grid">
         <a class="resource-card" href="https://github.com/su394611-del/MedSparse-Healthcare-LLM-From-Scratch" target="_blank" rel="noopener noreferrer"><span class="resource-icon">&lt;/&gt;</span><span><strong>GitHub repository</strong><small>Source code, tests, configurations and scripts</small></span><span class="resource-arrow">↗</span></a>
         <a class="resource-card" href="https://github.com/su394611-del/MedSparse-Healthcare-LLM-From-Scratch/blob/main/README.md" target="_blank" rel="noopener noreferrer"><span class="resource-icon">▤</span><span><strong>README.md</strong><small>Setup, architecture, datasets and training commands</small></span><span class="resource-arrow">↗</span></a>
@@ -416,10 +424,10 @@ The authors declare that the study of the study, the study is a role of the manu
 </script>
 <script src="/assets/privacy.js" defer></script>
 <script id="tiny-log-embed">
-  // Size the Tiny GPT training-log iframe to its content (same-origin message from the framed page).
+  // Size the embedded training-log and technical-report iframes to their content (same-origin messages from the framed pages).
   window.addEventListener('message', function (e) {
-    if (e.origin !== location.origin || !e.data || e.data.type !== 'tiny-gpt-log-height') return;
-    document.querySelectorAll('iframe.me-iframe').forEach(function (f) {
+    if (e.origin !== location.origin || !e.data || (e.data.type !== 'tiny-gpt-log-height' && e.data.type !== 'research-embed-height')) return;
+    document.querySelectorAll('iframe.me-iframe, iframe.report-iframe').forEach(function (f) {
       if (f.contentWindow === e.source) f.style.height = Math.ceil(e.data.height) + 'px';
     });
   });
