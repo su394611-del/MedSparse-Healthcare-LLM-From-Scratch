@@ -46,6 +46,7 @@ and was checked against Python's `hashlib` on 308 strings, Unicode edge cases in
 - `browser/aggregate.js`: bootstrap and Wilson intervals, paired SFT-vs-pretrained comparison.
 - `browser/test_node.js`: offline checks of the worker against a random-weight model in Node.
 - `build_pages.py`, `training_chart.py`: render the evaluation section and the training chart into `index.html`.
+- `tiny_log_page.py`: builds the Tiny GPT training-log page (`/training-logs/tiny-gpt/` on the main site).
 
 ## Re-run it
 
