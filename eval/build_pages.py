@@ -154,6 +154,8 @@ mix_css = """
 .me-links a:focus-visible{outline:3px solid #95eaff;outline-offset:2px}
 @media(max-width:1120px){.me-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.me-grid,.me-train-grid{grid-template-columns:1fr}}
 @media(max-width:600px){.me-stats{grid-template-columns:1fr}.me-stat b{font-size:26px}.me-card,.me-train{padding:16px}}
+/* Phones: stack each results row instead of clipping the Medical SFT and Reference columns */
+@media(max-width:600px){.me-table,.me-table caption,.me-table tbody{display:block}.me-table{min-width:0}.me-table caption{padding:14px 16px 12px;border-bottom:1px solid var(--line)}.me-table thead{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}.me-table tbody tr{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 14px;padding:12px 16px;border-bottom:1px solid var(--line)}.me-table tbody tr:last-child{border-bottom:0}.me-table tbody td{padding:0;border:0}.me-table tbody td:first-child,.me-table tbody td:nth-child(4){grid-column:1/-1}.me-table tbody td:nth-child(4){font-size:12.5px}.me-table tbody td:nth-child(n+2)::before{display:block;margin-bottom:2px;font-size:10px;font-weight:850;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}.me-table tbody td:nth-child(2)::before{content:"Pretrained"}.me-table tbody td:nth-child(3)::before{content:"Medical SFT"}.me-table tbody td:nth-child(4)::before{content:"Reference"}}
 """
 
 pm, sm = PRE['medmcqa'], SFT['medmcqa']
