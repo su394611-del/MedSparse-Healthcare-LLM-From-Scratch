@@ -54,7 +54,7 @@ def parse_args(argv=None):
     p.add_argument("--bf16", action="store_true")
     p.add_argument("--strategy", choices=["single", "ddp", "fsdp2"], default="single")
     p.add_argument("--device", choices=["auto", "cpu", "cuda"], default="auto",
-                   help="Force CPU to train models larger than 4GB GPU VRAM")
+                   help="Device to train on; use cpu for models that do not fit in GPU memory")
     p.add_argument("--eval-every", type=int, default=100)
     p.add_argument("--eval-batches", type=int, default=10)
     p.add_argument("--save-every", type=int, default=500)

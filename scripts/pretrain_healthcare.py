@@ -46,7 +46,7 @@ def parser():
     p.add_argument("--grad-clip", type=float, default=1.0)
     p.add_argument("--strategy", choices=["single", "ddp", "fsdp2"], default="single")
     p.add_argument("--device", choices=["auto", "cpu", "cuda"], default="auto",
-                   help="Force CPU to train models larger than 4GB GPU VRAM")
+                   help="Device to train on; use cpu for models that do not fit in GPU memory")
     p.add_argument("--bf16", action="store_true")
     p.add_argument("--seed", type=int, default=42)
     p.add_argument("--shuffle-buffer", type=int, default=1000)
