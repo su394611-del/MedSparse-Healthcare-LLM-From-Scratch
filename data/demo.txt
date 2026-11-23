@@ -1,0 +1,8 @@
+The quick brown fox jumps over the lazy dog.
+Language models learn to predict the next token in a sequence.
+A mixture of experts routes each token to a small number of expert networks.
+Offline smoke tests should run without downloading any datasets.
+Each nonblank line in this file is treated as one short document.
+Packing joins short documents into fixed-length training windows.
+Rotary position embeddings encode token positions inside attention.
+This file is synthetic demo text for the unit tests.
