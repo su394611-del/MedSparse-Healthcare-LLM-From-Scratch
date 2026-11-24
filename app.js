@@ -134,16 +134,21 @@
     const isOpen = nav?.classList.toggle('is-open');
     document.querySelector('.menu-button')?.setAttribute('aria-expanded', String(Boolean(isOpen)));
   });
+  function markTab(key) {
+    document.querySelectorAll('[data-diagram]').forEach(b => {
+      const selected = b.dataset.diagram === key;
+      b.classList.toggle('active', selected);
+      b.setAttribute('aria-selected', String(selected));
+    });
+  }
   for (const button of document.querySelectorAll('[data-diagram]')) {
     button.addEventListener('click', () => {
-      document.querySelectorAll('[data-diagram]').forEach(b => {
-        const selected = b === button;
-        b.classList.toggle('active', selected);
-        b.setAttribute('aria-selected', String(selected));
-      });
+      markTab(button.dataset.diagram);
       displayDiagram(button.dataset.diagram);
     });
   }
+  // Vue used to highlight the initial tab; mark it here so the selected diagram is visible on load.
+  markTab(activeKey);
   document.getElementById('copy-diagram-button')?.addEventListener('click', copySource);
   displayDiagram(activeKey);
 })();
