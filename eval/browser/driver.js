@@ -123,11 +123,12 @@
   function hfSha(repo) { return getJSON('https://huggingface.co/api/models/' + repo).then(function (j) { return j.sha; }); }
 
   var queue = [], active = 0, MAX = Math.max(2, Math.min(8, (navigator.hardwareConcurrency || 4) - 1));
+  var engineSource;
   function runJob(name, job) {
     return new Promise(function (resolve, reject) {
       queue.push(function () {
         active++;
-        var src = document.getElementById('engine-src').textContent;
+        var src = engineSource;
         var line = 'const chosen = order.slice(0, this.topK);';
         if (src.indexOf(line) === -1) { reject(new Error('engine changed: router hook not found')); return; }
         src = src.replace(line, line + ' if (self.__route) self.__route(l, chosen);');
@@ -147,7 +148,11 @@
   }
   function pump() { while (active < MAX && queue.length) queue.shift()(); }
 
-  S.run = Promise.all([hfSha(REPOS.pre.repo), hfSha(REPOS.sft.repo), hfSha(REPOS.tiny.repo)]).then(function (shas) {
+  S.run = Promise.all([hfSha(REPOS.pre.repo), hfSha(REPOS.sft.repo), hfSha(REPOS.tiny.repo), fetch(new URL('engine-src.js', document.baseURI)).then(function (response) {
+    if (!response.ok) throw new Error('Cannot load playground engine: ' + response.status);
+    return response.text();
+  })]).then(function (shas) {
+    engineSource = shas[3];
     REPOS.pre.sha = shas[0]; REPOS.sft.sha = shas[1]; REPOS.tiny.sha = shas[2];
     S.shas = { pre: shas[0], sft: shas[1], tiny: shas[2] };
     S.status = 'selecting data';

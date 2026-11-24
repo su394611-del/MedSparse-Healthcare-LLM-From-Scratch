@@ -7,6 +7,8 @@ Sources (all real):
   eval/results.json: browser re-measurement on TinyStories validation stories
 """
 import html
+import re
+import shutil
 import json
 import math
 import sys
@@ -83,39 +85,7 @@ page = f"""<!DOCTYPE html>
 <link href="https://su394611-del.github.io/training-logs/tiny-gpt/" rel="canonical"/>
 <link href="/assets/favicon.svg" rel="icon" type="image/svg+xml"/>
 <title>Tiny GPT training log | Sudhanshu Shukla</title>
-<style>
-  *,*::before,*::after{{box-sizing:border-box}}
-  html,body{{margin:0;background:#0b1628;color:{INK};font:14px/1.6 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}}
-  main{{max-width:1080px;margin:0 auto;padding:22px 22px 26px}}
-  .kicker{{margin:0 0 4px;font-size:10.5px;font-weight:850;letter-spacing:.16em;text-transform:uppercase;color:#74e3ea}}
-  h1{{margin:0 0 6px;font-size:21px;line-height:1.25}}
-  .lede{{margin:0 0 16px;max-width:760px;color:{MUTED};font-size:13.5px}}
-  .facts{{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 18px;padding:0;list-style:none}}
-  .facts li{{padding:5px 10px;border:1px solid #274057;border-radius:999px;font-size:12px;color:{MUTED};background:#102137}}
-  .facts b{{color:{INK};font-weight:750}}
-  .grid{{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:22px;align-items:start}}
-  .panel{{padding:16px;border:1px solid #274057;border-radius:14px;background:linear-gradient(150deg,#142942,#102137)}}
-  .legend{{display:flex;flex-wrap:wrap;gap:6px 16px;margin:0 0 6px;font-size:12.5px;color:{MUTED}}}
-  .legend span{{display:inline-flex;align-items:center;gap:8px}}
-  .legend i{{display:inline-block;width:18px;height:3px;border-radius:2px}}
-  svg{{display:block;width:100%;height:auto;max-width:520px}}
-  h2{{margin:0 0 8px;font-size:13px;font-weight:850;letter-spacing:.1em;text-transform:uppercase;color:{DIM}}}
-  table{{width:100%;border-collapse:collapse;font-size:13px}}
-  th,td{{padding:8px 6px;text-align:left;border-bottom:1px solid #274057;vertical-align:top}}
-  th{{font-size:10.5px;font-weight:850;letter-spacing:.1em;text-transform:uppercase;color:{DIM}}}
-  td{{color:{MUTED}}} td b{{color:{INK}}}
-  .settings td:first-child{{color:{INK};font-weight:650;white-space:nowrap}}
-  .tag{{display:inline-block;margin-left:6px;padding:0 6px;border-radius:6px;font-size:10.5px;font-weight:750;color:#0b1628;background:#87e1c8}}
-  .tag.def{{background:#a8bdd4}}
-  .note{{margin:12px 0 0;font-size:12.5px;color:{MUTED}}}
-  .check{{margin:14px 0 0;padding:12px 14px;border:1px solid #274057;border-radius:10px;font-size:13px;color:{MUTED};background:#0e1c31}}
-  .check b{{color:{INK}}}
-  a{{color:#74e3ea}} a:focus-visible{{outline:3px solid #95eaff;outline-offset:2px;border-radius:4px}}
-  .links{{display:flex;flex-wrap:wrap;gap:6px 16px;margin:16px 0 0;font-size:12.5px}}
-  @media(max-width:820px){{.grid{{grid-template-columns:minmax(0,1fr)}}}}
-  .panel{{min-width:0;overflow-x:auto}}
-  @media(max-width:480px){{main{{padding:16px 14px 20px}}.panel{{padding:12px}}.settings td:first-child{{white-space:normal}}}}
-</style>
+<link rel="stylesheet" href="page.css">
 </head>
 <body>
 <main>
@@ -128,7 +98,7 @@ page = f"""<!DOCTYPE html>
   </ul>
   <div class="grid">
     <section class="panel" aria-label="Loss per epoch">
-      <div class="legend"><span><i style="background:{TRAIN}"></i>Training loss (mean over the epoch)</span><span><i style="background:{VAL}"></i>Validation loss (30 held-out stories)</span></div>
+      <div class="legend"><span><i class="training-swatch"></i>Training loss (mean over the epoch)</span><span><i class="validation-swatch"></i>Validation loss (30 held-out stories)</span></div>
       {chart()}
       <p class="note">Training loss is averaged while the weights are still changing and with dropout on, so it sits above validation loss. The untrained point is the uniform-guess value, not a logged one.</p>
     </section>
@@ -142,7 +112,7 @@ page = f"""<!DOCTYPE html>
       <div class="check"><b>Independent re-check.</b> The published weights, run in the browser on the first {tiny['items']} stories of TinyStories' own validation file, score a loss of <b>{tiny['meanNll']:.3f}</b> (perplexity {tiny['perplexity']:,.0f}, 95% interval {tiny['ci95'][0]:,.0f}–{tiny['ci95'][1]:,.0f}), within 0.4% of the logged {EPOCHS[-1][2]:.4f}.</div>
     </section>
   </div>
-  <section class="panel" style="margin-top:18px" aria-label="Run settings">
+  <section class="panel settings-spacing" aria-label="Run settings">
     <h2>Run settings</h2>
     <table class="settings"><tbody>
       <tr><td>Program</td><td><code>transformer_hf_dataset_and_llm.py --generate-llm</code> (run_generate_llm)<span class="tag">recorded</span></td></tr>
@@ -156,20 +126,20 @@ page = f"""<!DOCTYPE html>
   </section>
   <p class="links"><a href="https://huggingface.co/sudhanshu42844/my-tiny-llm" target="_blank" rel="noopener noreferrer">Model card ↗</a><a href="/playground/?model=tiny" target="_top">Run it in the browser</a><a href="/#model-evaluation" target="_top">Model evaluation</a></p>
 </main>
-<script>
-  // When embedded, tell the parent page how tall this content is (same origin).
-  (function () {{
-    if (window.self === window.top) return;
-    function send() {{ try {{ parent.postMessage({{ type: 'tiny-gpt-log-height', height: document.documentElement.scrollHeight }}, location.origin); }} catch (e) {{}} }}
-    window.addEventListener('load', send);
-    window.addEventListener('resize', send);
-    if (window.ResizeObserver) new ResizeObserver(send).observe(document.body);
-  }})();
-</script>
+<script src="page-behavior.js" defer></script>
 <script src="/assets/privacy.js" defer></script>
 </body>
 </html>
 """
 OUT.parent.mkdir(parents=True, exist_ok=True)
+assets = Path(__file__).with_name('training-log-assets')
+OUT.parent.mkdir(parents=True, exist_ok=True)
+for asset in assets.iterdir():
+    shutil.copyfile(asset, OUT.parent / asset.name)
+if OUT.exists():
+    # Only replace the data region, preserving navigation added by the site generator.
+    existing = OUT.read_text(encoding='utf8')
+    content = re.search(r'<main[^>]*>(.*?)</main>', page, re.S).group(1)
+    page = re.sub(r'(<main[^>]*>).*?(</main>)', lambda m: m[1] + content + m[2], existing, count=1, flags=re.S)
 OUT.write_text(page, encoding='utf8')
 print('wrote', OUT, len(page), 'bytes')

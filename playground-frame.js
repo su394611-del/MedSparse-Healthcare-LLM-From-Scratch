@@ -1,0 +1,2 @@
+/* Resize the playground iframe to fit its content; /playground/ posts its height. */
+(function(){window.addEventListener('message',function(e){if(e.origin!==window.location.origin)return;var d=e.data;if(!d||d.type!=='playground-frame:height')return;var f=document.getElementById('ss-try-frame');if(!f||e.source!==f.contentWindow)return;var h=Math.ceil(Number(d.height));if(h>0&&h<5000)f.style.height=h+'px';});})();
