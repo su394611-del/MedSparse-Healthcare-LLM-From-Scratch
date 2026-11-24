@@ -79,6 +79,7 @@ page = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
+<meta http-equiv="Content-Security-Policy" content="base-uri 'none'; object-src 'none'; script-src 'self'; script-src-attr 'none'; frame-src 'none'; worker-src 'self'; form-action 'none'">
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
 <meta content="#0b1628" name="theme-color"/>
 <meta content="Training log of Tiny GPT, a 1.06M-parameter GPT-2-style model trained from scratch on TinyStories: loss per epoch, settings and an independent re-check." name="description"/>
@@ -109,7 +110,7 @@ page = f"""<!DOCTYPE html>
         <tbody>{rows}</tbody></table>
         <p class="note">The program keeps the checkpoint with the lowest validation loss, so the published weights are from epoch 2.</p>
       </div>
-      <div class="check"><b>Independent re-check.</b> The published weights, run in the browser on the first {tiny['items']} stories of TinyStories' own validation file, score a loss of <b>{tiny['meanNll']:.3f}</b> (perplexity {tiny['perplexity']:,.0f}, 95% interval {tiny['ci95'][0]:,.0f}–{tiny['ci95'][1]:,.0f}), within 0.4% of the logged {EPOCHS[-1][2]:.4f}.</div>
+      <div class="check"><b>Independent re-check.</b> The published weights, run in the browser on the first {tiny['items']:d} stories of TinyStories' own validation file, score a loss of <b>{tiny['meanNll']:.3f}</b> (perplexity {tiny['perplexity']:,.0f}, 95% interval {tiny['ci95'][0]:,.0f}–{tiny['ci95'][1]:,.0f}), within 0.4% of the logged {EPOCHS[-1][2]:.4f}.</div>
     </section>
   </div>
   <section class="panel settings-spacing" aria-label="Run settings">

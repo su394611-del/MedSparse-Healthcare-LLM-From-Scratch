@@ -52,7 +52,7 @@ qa_change = 1 - qa_ratio['ratio']          # >0 means SFT lower perplexity
 qa_sig = qa_ratio['ci95'][1] < 1
 pm_change = pm_ratio['ratio'] - 1          # >0 means SFT higher perplexity on PubMed
 pm_sig = pm_ratio['ci95'][0] > 1 or pm_ratio['ci95'][1] < 1
-date = RES['generated'][:10]
+date = E(RES['generated'][:10])
 n = RES['data']
 
 
@@ -112,8 +112,8 @@ stage_rows = (
                 f"<b>{PRE['medicalQaHeldOut']['meanNll']:.2f}</b><small>perplexity {ppl(PRE['medicalQaHeldOut']['perplexity'])}</small>")
     + stage_row('Medical SFT', '7,000', f"<b>{SFT['pubmedHeldOut']['meanNll']:.2f}</b><small>perplexity {ppl(SFT['pubmedHeldOut']['perplexity'])}</small>",
                 f"<b>{SFT['medicalQaHeldOut']['meanNll']:.2f}</b><small>perplexity {ppl(SFT['medicalQaHeldOut']['perplexity'])}</small>"))
-legend = (f'<div class="me-legend"><span><i style="background:{training_chart.PUBMED}"></i>PubMed held-out ({n["pubmed"]["selected"]} articles)</span>'
-          f'<span><i style="background:{training_chart.QA}"></i>Medical Q&amp;A held-out ({n["qa"]["selected"]} answers)</span></div>')
+legend = (f'<div class="me-legend"><span><i style="background:{training_chart.PUBMED}"></i>PubMed held-out ({n["pubmed"]["selected"]:d} articles)</span>'
+          f'<span><i style="background:{training_chart.QA}"></i>Medical Q&amp;A held-out ({n["qa"]["selected"]:d} answers)</span></div>')
 if step_svg:
     train_intro = 'Training and validation loss logged at every step of both stages, with held-out loss at each published checkpoint below.'
     train_charts = step_svg + legend + training_chart.stage_chart(RES)
@@ -142,10 +142,10 @@ mix_section = f"""<!-- model-eval:start -->
     <section class="section container" id="evaluation" aria-labelledby="evaluation-title" v-pre>
       <div class="section-intro"><div><p class="kicker">04 / MODEL EVALUATION</p><h2 id="evaluation-title">Held-out results, <span class="gradient-text">measured in the browser.</span></h2></div><p>Both checkpoints scored on data they never trained on, picked with the same hash-based splits the training code uses, and run on the same JavaScript engine as the playground above. Evaluated {date}.</p></div>
       <div class="me-stats">
-        <div class="me-stat"><span class="me-label">Medical Q&amp;A perplexity</span><b class="{'me-good' if qa_sig and qa_change > 0 else ''}">{ppl(SFT['medicalQaHeldOut']['perplexity'])} <small>after SFT</small></b><p>{ppl(PRE['medicalQaHeldOut']['perplexity'])} before SFT{f" · {pc(qa_change, 0)} lower" if qa_change > 0 else ""}. {n['qa']['selected']} held-out medical-o1 answers.</p></div>
-        <div class="me-stat"><span class="me-label">PubMed perplexity</span><b>{ppl(PRE['pubmedHeldOut']['perplexity'])} <small>pretrained</small></b><p>{ppl(SFT['pubmedHeldOut']['perplexity'])} after SFT. {n['pubmed']['selected']} held-out PubMed Central articles.</p></div>
+        <div class="me-stat"><span class="me-label">Medical Q&amp;A perplexity</span><b class="{'me-good' if qa_sig and qa_change > 0 else ''}">{ppl(SFT['medicalQaHeldOut']['perplexity'])} <small>after SFT</small></b><p>{ppl(PRE['medicalQaHeldOut']['perplexity'])} before SFT{f" · {pc(qa_change, 0)} lower" if qa_change > 0 else ""}. {n['qa']['selected']:d} held-out medical-o1 answers.</p></div>
+        <div class="me-stat"><span class="me-label">PubMed perplexity</span><b>{ppl(PRE['pubmedHeldOut']['perplexity'])} <small>pretrained</small></b><p>{ppl(SFT['pubmedHeldOut']['perplexity'])} after SFT. {n['pubmed']['selected']:d} held-out PubMed Central articles.</p></div>
         <div class="me-stat"><span class="me-label">MedMCQA accuracy</span><b>{pc(sm['accuracy'], 0)} <small>SFT</small></b><p>{pc(pm['accuracy'], 0)} pretrained · 25% chance · {pc(sm['majorityClassBaseline'], 0)} for always answering “A” in this sample. Close to guessing at this size.</p></div>
-        <div class="me-stat"><span class="me-label">Speed in the browser</span><b>{SFT['decodeTokensPerSec']:.0f} <small>tokens/s</small></b><p>Plain JavaScript on one CPU thread, no GPU or server. Measured in a background tab on an {RES['environment']['cpuThreads']}-thread CPU; about 20 tokens/s in a visible tab.</p></div>
+        <div class="me-stat"><span class="me-label">Speed in the browser</span><b>{SFT['decodeTokensPerSec']:.0f} <small>tokens/s</small></b><p>Plain JavaScript on one CPU thread, no GPU or server. Measured in a background tab on an {RES['environment']['cpuThreads']:d}-thread CPU; about 20 tokens/s in a visible tab.</p></div>
       </div>
       <div class="me-table-wrap">
         <table class="me-table">
@@ -156,7 +156,7 @@ mix_section = f"""<!-- model-eval:start -->
             <tr><td>Medical Q&amp;A held-out perplexity</td><td><b>{ppl(PRE['medicalQaHeldOut']['perplexity'])}</b><span class="me-ci">{ci(PRE['medicalQaHeldOut']['ci95'])}</span></td><td><b>{ppl(SFT['medicalQaHeldOut']['perplexity'])}</b><span class="me-ci">{ci(SFT['medicalQaHeldOut']['ci95'])}</span></td><td>Answer tokens only · {SFT['medicalQaHeldOut']['tokens']:,} tokens</td></tr>
             <tr><td>Next-token top-1 accuracy, PubMed</td><td><b>{pc(PRE['pubmedHeldOut']['top1Accuracy'])}</b></td><td><b>{pc(SFT['pubmedHeldOut']['top1Accuracy'])}</b></td><td>Exact next-token match</td></tr>
             <tr><td>Next-token top-1 accuracy, Q&amp;A</td><td><b>{pc(PRE['medicalQaHeldOut']['top1Accuracy'])}</b></td><td><b>{pc(SFT['medicalQaHeldOut']['top1Accuracy'])}</b></td><td>Exact next-token match</td></tr>
-            <tr><td>MedMCQA accuracy ({sm['items']} questions)</td><td><b>{pc(pm['accuracy'])}</b><span class="me-ci">{pc(pm['ci95'][0])}–{pc(pm['ci95'][1])}</span></td><td><b>{pc(sm['accuracy'])}</b><span class="me-ci">{pc(sm['ci95'][0])}–{pc(sm['ci95'][1])}</span></td><td>Chance 25% · most common answer {pc(sm['majorityClassBaseline'])}</td></tr>
+            <tr><td>MedMCQA accuracy ({sm['items']:d} questions)</td><td><b>{pc(pm['accuracy'])}</b><span class="me-ci">{pc(pm['ci95'][0])}–{pc(pm['ci95'][1])}</span></td><td><b>{pc(sm['accuracy'])}</b><span class="me-ci">{pc(sm['ci95'][0])}–{pc(sm['ci95'][1])}</span></td><td>Chance 25% · most common answer {pc(sm['majorityClassBaseline'])}</td></tr>
             <tr><td>Decode speed (browser, CPU)</td><td><b>{PRE['decodeTokensPerSec']:.1f}</b> tokens/s</td><td><b>{SFT['decodeTokensPerSec']:.1f}</b> tokens/s</td><td>64 greedy tokens, one Web Worker</td></tr>
           </tbody>
         </table>
@@ -184,10 +184,10 @@ mix_section = f"""<!-- model-eval:start -->
         <summary>How this was measured, and the limits</summary>
         <ul>
           <li><strong>What it means.</strong> {qa_sentence()} {pm_sentence()} On MedMCQA the SFT model is {mcq_verdict(sm)} and the pretrained model is {mcq_verdict(pm)}: expected for 38.8M parameters. The clearest improvement to make next: only {pc(n['qa']['questionFullyKeptShare'], 0)} of held-out Q&amp;A examples keep the whole question inside the 128-token training window, so SFT mostly learns answer style without the question. Fine-tuning with longer sequences (for example 512 tokens) should help most.</li>
-          <li><strong>Held-out data.</strong> PubMed: the first {n['pubmed']['selected']} articles in <code>licensed_pubmed-0000.json.gz</code> that pass the training filters (clinical keywords, CC0/CC-BY licence) and fall in the 2% validation partition of <code>stable_partition</code> ({n['pubmed']['scanned']:,} scanned). Q&amp;A: the first {n['qa']['selected']} medical-o1 (en) rows in the 5% validation bucket of <code>bucket_for_question</code>. Both splits use BLAKE2b with seed 42, re-implemented in JavaScript and checked against Python's hashlib.</li>
+          <li><strong>Held-out data.</strong> PubMed: the first {n['pubmed']['selected']:d} articles in <code>licensed_pubmed-0000.json.gz</code> that pass the training filters (clinical keywords, CC0/CC-BY licence) and fall in the 2% validation partition of <code>stable_partition</code> ({n['pubmed']['scanned']:,} scanned). Q&amp;A: the first {n['qa']['selected']:d} medical-o1 (en) rows in the 5% validation bucket of <code>bucket_for_question</code>. Both splits use BLAKE2b with seed 42, re-implemented in JavaScript and checked against Python's hashlib.</li>
           <li><strong>Scoring.</strong> PubMed uses the packed pretraining window (128 scored tokens per article, no &lt;bos&gt;). Q&amp;A mirrors <code>tokenize_example(seq_len=128)</code>: the chat template, answer-only loss, and the prompt trimmed from the left. Because answers are long, only {pc(n['qa']['questionFullyKeptShare'], 0)} of these examples keep the whole question inside the 128-token window, which is also true of training.</li>
-          <li><strong>MedMCQA.</strong> The first {sm['items']} validation questions; each option is scored by its mean log-probability per token after the question (cloze style, options not shown). Wilson 95% intervals.</li>
-          <li><strong>Engine.</strong> The playground's float32 JavaScript implementation of the published weights (Hugging Face revisions <code>{RES['models']['pretrained']['revision'][:8]}</code> and <code>{RES['models']['sft']['revision'][:8]}</code>), not PyTorch. Uncertainty: 2,000-sample bootstrap over items.</li>
+          <li><strong>MedMCQA.</strong> The first {sm['items']:d} validation questions; each option is scored by its mean log-probability per token after the question (cloze style, options not shown). Wilson 95% intervals.</li>
+          <li><strong>Engine.</strong> The playground's float32 JavaScript implementation of the published weights (Hugging Face revisions <code>{E(RES['models']['pretrained']['revision'][:8])}</code> and <code>{E(RES['models']['sft']['revision'][:8])}</code>), not PyTorch. Uncertainty: 2,000-sample bootstrap over items.</li>
           <li><strong>Not a clinical evaluation.</strong> These numbers measure language modelling on held-out text. They say nothing about medical safety or correctness.</li>
         </ul>
       </details>
@@ -236,10 +236,10 @@ summary = f"""<!-- results:start -->
 
 | Metric | Pretrained | Medical SFT |
 |---|---|---|
-| PubMed held-out perplexity ({n['pubmed']['selected']} articles) | {ppl(PRE['pubmedHeldOut']['perplexity'])} ({ci(PRE['pubmedHeldOut']['ci95'])}) | {ppl(SFT['pubmedHeldOut']['perplexity'])} ({ci(SFT['pubmedHeldOut']['ci95'])}) |
-| Medical Q&A held-out perplexity ({n['qa']['selected']} answers) | {ppl(PRE['medicalQaHeldOut']['perplexity'])} ({ci(PRE['medicalQaHeldOut']['ci95'])}) | {ppl(SFT['medicalQaHeldOut']['perplexity'])} ({ci(SFT['medicalQaHeldOut']['ci95'])}) |
+| PubMed held-out perplexity ({n['pubmed']['selected']:d} articles) | {ppl(PRE['pubmedHeldOut']['perplexity'])} ({ci(PRE['pubmedHeldOut']['ci95'])}) | {ppl(SFT['pubmedHeldOut']['perplexity'])} ({ci(SFT['pubmedHeldOut']['ci95'])}) |
+| Medical Q&A held-out perplexity ({n['qa']['selected']:d} answers) | {ppl(PRE['medicalQaHeldOut']['perplexity'])} ({ci(PRE['medicalQaHeldOut']['ci95'])}) | {ppl(SFT['medicalQaHeldOut']['perplexity'])} ({ci(SFT['medicalQaHeldOut']['ci95'])}) |
 | Next-token top-1 accuracy, PubMed / Q&A | {pc(PRE['pubmedHeldOut']['top1Accuracy'])} / {pc(PRE['medicalQaHeldOut']['top1Accuracy'])} | {pc(SFT['pubmedHeldOut']['top1Accuracy'])} / {pc(SFT['medicalQaHeldOut']['top1Accuracy'])} |
-| MedMCQA accuracy ({sm['items']} questions, chance 25%) | {pc(pm['accuracy'])} ({pc(pm['ci95'][0])}–{pc(pm['ci95'][1])}) | {pc(sm['accuracy'])} ({pc(sm['ci95'][0])}–{pc(sm['ci95'][1])}) |
+| MedMCQA accuracy ({sm['items']:d} questions, chance 25%) | {pc(pm['accuracy'])} ({pc(pm['ci95'][0])}–{pc(pm['ci95'][1])}) | {pc(sm['accuracy'])} ({pc(sm['ci95'][0])}–{pc(sm['ci95'][1])}) |
 | Decode speed in the browser | {PRE['decodeTokensPerSec']:.1f} tokens/s | {SFT['decodeTokensPerSec']:.1f} tokens/s |
 
 Tiny GPT ([my-tiny-llm](https://huggingface.co/sudhanshu42844/my-tiny-llm)): TinyStories validation perplexity {ppl(tl['perplexity'])} ({ci(tl['ci95'])}) on {tl['items']} stories; {TINY['decodeTokensPerSec']:.0f} tokens/s.
@@ -255,9 +255,9 @@ home_section = f"""<!-- model-eval:start -->
 <section aria-labelledby="model-eval-heading" class="layout model-eval" id="model-evaluation" v-pre>
 <div class="me-head"><div><p class="me-kicker">Model evaluation · {date}</p><h2 id="model-eval-heading">Three models, scored on held-out data.</h2></div><p>Measured in the browser with the same JavaScript engine as the <a href="/playground/" style="color:var(--cyan,#7be2f0)">Model Playground</a>, on text none of the models saw in training. Lower perplexity is better; it is not comparable across models with different tokenizers and data.</p></div>
 <div class="me-cards">
-<article class="me-model"><div class="me-model-top"><span>MedSparse · Medical SFT</span><span>38.8M · MoE</span></div><h3>MedSparse Healthcare Medical SFT</h3><p class="me-size">Held-out medical Q&amp;A ({n['qa']['selected']} answers)</p><p class="me-big"><b>{ppl(SFT['medicalQaHeldOut']['perplexity'])}</b><span>perplexity</span></p>
+<article class="me-model"><div class="me-model-top"><span>MedSparse · Medical SFT</span><span>38.8M · MoE</span></div><h3>MedSparse Healthcare Medical SFT</h3><p class="me-size">Held-out medical Q&amp;A ({n['qa']['selected']:d} answers)</p><p class="me-big"><b>{ppl(SFT['medicalQaHeldOut']['perplexity'])}</b><span>perplexity</span></p>
 <ul><li>Before SFT<strong>{ppl(PRE['medicalQaHeldOut']['perplexity'])}{f' <span class="me-up">−{pc(qa_change, 0)}</span>' if qa_sig and qa_change > 0 else ''}</strong></li><li>MedMCQA accuracy<strong>{pc(sm['accuracy'], 0)} <span style="color:#8eacc8">(chance 25%)</span></strong></li><li>Browser speed<strong>{SFT['decodeTokensPerSec']:.0f} tokens/s</strong></li></ul></article>
-<article class="me-model"><div class="me-model-top"><span>MedSparse · Pretrained</span><span>38.8M · MoE</span></div><h3>MedSparse Healthcare Pretrained</h3><p class="me-size">Held-out PubMed articles ({n['pubmed']['selected']} documents)</p><p class="me-big"><b>{ppl(PRE['pubmedHeldOut']['perplexity'])}</b><span>perplexity</span></p>
+<article class="me-model"><div class="me-model-top"><span>MedSparse · Pretrained</span><span>38.8M · MoE</span></div><h3>MedSparse Healthcare Pretrained</h3><p class="me-size">Held-out PubMed articles ({n['pubmed']['selected']:d} documents)</p><p class="me-big"><b>{ppl(PRE['pubmedHeldOut']['perplexity'])}</b><span>perplexity</span></p>
 <ul><li>95% interval<strong>{ci(PRE['pubmedHeldOut']['ci95'])}</strong></li><li>Next-token accuracy<strong>{pc(PRE['pubmedHeldOut']['top1Accuracy'], 0)}</strong></li><li>Browser speed<strong>{PRE['decodeTokensPerSec']:.0f} tokens/s</strong></li></ul></article>
 <article class="me-model"><div class="me-model-top"><span>GPT-2 style</span><span>1.06M</span></div><h3>Tiny GPT (TinyStories)</h3><p class="me-size">TinyStories validation ({tl['items']} stories)</p><p class="me-big"><b>{ppl(tl['perplexity'])}</b><span>perplexity</span></p>
 <ul><li>95% interval<strong>{ci(tl['ci95'])}</strong></li><li>Model card (PyTorch)<strong>{ppl(math.exp(TINY['modelCardValidationLoss']))} ✓ matches</strong></li><li>Browser speed<strong>{TINY['decodeTokensPerSec']:.0f} tokens/s</strong></li></ul></article>
