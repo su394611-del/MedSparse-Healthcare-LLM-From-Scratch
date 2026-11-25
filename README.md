@@ -2,7 +2,7 @@
 
 *MedSparse Healthcare (formerly Mixtral Healthcare) is a custom sparse Mixture-of-Experts language model with a Mixtral-inspired architecture. It does not use or distribute official Mistral AI or Mixtral weights.*
 
-**Released work:** the 38.8M-parameter [pretrained](https://huggingface.co/sudhanshu42844/medsparse-healthcare-pretrained-from-scratch), [medical SFT](https://huggingface.co/sudhanshu42844/medsparse-healthcare-medical-sft), and [MIRIAD SFT](https://huggingface.co/sudhanshu42844/medsparse-healthcare-miriad-sft) checkpoints on Hugging Face, the [technical report](https://su394611-del.github.io/research/medsparse-healthcare-2026/) (DOI [10.5281/zenodo.24461541](https://doi.org/10.5281/zenodo.24461541)), the [project site](https://su394611-del.github.io/MedSparse-Healthcare-LLM-From-Scratch/) with an in-browser playground, and the [engineering wiki](https://github.com/su394611-del/MedSparse-Healthcare-LLM-From-Scratch/wiki). Held-out results are in [`eval/results.json`](eval/results.json) and [`eval/results_miriad.json`](eval/results_miriad.json).
+**Released work:** the 38.8M-parameter [pretrained](https://huggingface.co/sudhanshu42844/medsparse-healthcare-pretrained-from-scratch), [medical SFT](https://huggingface.co/sudhanshu42844/medsparse-healthcare-medical-sft), and [MIRIAD SFT](https://huggingface.co/sudhanshu42844/medsparse-healthcare-miriad-sft) checkpoints on Hugging Face, the [technical report](https://su394611-del.github.io/research/medsparse-healthcare-2026/) (DOI [10.5281/zenodo.24461541](https://doi.org/10.5281/zenodo.24461541)), the [project site](https://su394611-del.github.io/MedSparse-Healthcare-LLM-From-Scratch/) with an in-browser playground, and the [engineering wiki](https://github.com/su394611-del/MedSparse-Healthcare-LLM-From-Scratch/wiki). Held-out results are in [`eval/results.json`](eval/results.json) and [`eval/results_miriad.json`](eval/results_miriad.json). A free [in-browser demo](https://huggingface.co/spaces/sudhanshu42844/medsparse-healthcare-demo) runs on Hugging Face Spaces.
 
 ## Run MedSparse
 
@@ -61,7 +61,7 @@ python -m scripts.train_healthcare_tokenizer \
   --output artifacts/healthcare_tokenizer.json
 ```
 
-**Verify the printed ACTUAL tokenizer vocabulary size is precisely `32000`.** If not, change `vocab_size` in the model config to match *before Stage 1*. Keep the same tokenizer for both stages; mismatched token IDs or changing vocabulary will invalidate the Stage 1 model.
+**Check the ACTUAL vocabulary size the script prints.** It can come out below `--vocab-size` (the released 38.8M checkpoints use a 30,001-token tokenizer, matching `configs/healthcare_moe_single.json`). Set `vocab_size` in the model config to the printed size *before Stage 1*. Keep the same tokenizer for both stages; mismatched token IDs or changing vocabulary will invalidate the Stage 1 model.
 
 ### Stage 1 — pretrain the 1.08B MedSparse MoE from random initialization
 
@@ -169,6 +169,6 @@ configs/healthcare_*.json           1B, 46.7B, million-position experimental pre
 data/                                Byte tokenizer and synthetic fixtures for the offline smoke test and unit tests
 ```
 
-**Status as packaged:** The small-model two-stage CPU smoke passed, and the automated tests in `tests/` passed. Live HF dataset loading, BPE tokenizer dependency, multi-GPU FSDP2 training, billion-parameter training, and full 1M context functionality have NOT been executed here. The packaging environment had no CUDA device or Hugging Face access, and `tokenizers` is only available after you install the requirements. This is a runnable, research-grade training codebase, not production software.
+**Status:** The 38.8M configuration was trained through all three stages above with live Hugging Face data (Stage 3 on a single consumer-grade GPU), and the released checkpoints are evaluated in [`eval/`](eval/). The small-model two-stage CPU smoke test and the automated tests in `tests/` pass. Multi-GPU FSDP2 training, billion-parameter training and full 1M-token context have NOT been run. This is a runnable, research-grade training codebase, not production software.
 
 This project is licensed under the [Apache License, Version 2.0](LICENSE). © 2026 Sudhanshu Shukla.

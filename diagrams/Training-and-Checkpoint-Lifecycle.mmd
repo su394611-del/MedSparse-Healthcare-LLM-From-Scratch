@@ -10,9 +10,12 @@ flowchart LR
     SFTCK[("Stage 2 last.pt<br/>weights + optimizer + step")]
     RES["Resume medical SFT"]
     REST["Restore SFT weights,<br/>optimizer and saved step"]
+    MIR["Full-parameter MIRIAD SFT<br/>Stage 2 weights, fresh optimizer"]
+    MIRCK[("Stage 3 checkpoint<br/>lowest validation loss")]
     TEST["Validation CE / perplexity<br/>and independent medical review"]
 
     START --> CFG --> PT --> PTCK --> FIRST --> PTW --> FRESH --> SFT --> SFTCK --> TEST
+    SFTCK --> MIR --> MIRCK --> TEST
     SFTCK --> RES --> REST --> SFT
 
     NOTE["Use --pretrained for a first SFT run;<br/>use --resume for continuation;<br/>never specify both together"]
@@ -21,5 +24,5 @@ flowchart LR
 
     classDef checkpoint fill:#e6f8ec,stroke:#4f9c70,color:#255d3e
     classDef warning fill:#fff2dd,stroke:#bf8b43,color:#794a18
-    class PTCK,SFTCK checkpoint
+    class PTCK,SFTCK,MIRCK checkpoint
     class NOTE warning
