@@ -7,7 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#080f1d">
   <meta name="author" content="Sudhanshu Shukla">
-  <meta name="description" content="Explore MedSparse Healthcare, a custom Mixtral-inspired sparse Mixture-of-Experts healthcare LLM built with PyTorch, including from-scratch biomedical pretraining, full-parameter medical SFT, architecture diagrams, GitHub source and two Hugging Face model releases.">
+  <meta name="description" content="Explore MedSparse Healthcare, a custom Mixtral-inspired sparse Mixture-of-Experts healthcare LLM built with PyTorch, including from-scratch biomedical pretraining, full-parameter medical SFT, architecture diagrams, GitHub source and three Hugging Face model releases.">
   <meta name="robots" content="index, follow, max-image-preview:large">
   <link rel="canonical" href="https://su394611-del.github.io/MedSparse-Healthcare-LLM-From-Scratch/">
   <link rel="icon" type="image/svg+xml" href="./favicon.svg">
@@ -52,13 +52,13 @@
         <p class="eyebrow"><span class="signal" aria-hidden="true"></span> FROM FIRST PRINCIPLES <span class="eyebrow-year">/ 2026</span></p>
         <h1 id="hero-title">A healthcare LLM,<br><span class="gradient-text">built from scratch.</span></h1>
         <p class="hero-intro">An end-to-end PyTorch implementation of <strong>MedSparse Healthcare</strong>, a Mixtral-inspired sparse Mixture-of-Experts language model — from healthcare-specific tokenization and biomedical pretraining to full-parameter supervised medical fine-tuning.</p>
-        <p class="hero-support">Explore the design, trace how model weights move between training stages, inspect editable architecture diagrams, and access two distinct releases on Hugging Face.</p>
+        <p class="hero-support">Explore the design, trace how model weights move between training stages, inspect editable architecture diagrams, and access three releases on Hugging Face, the newest fine-tuned on 5.8M MIRIAD medical Q&amp;A pairs.</p>
         <div class="hero-actions">
-          <a class="button primary" href="#models">Explore both models <span aria-hidden="true">↗</span></a>
+          <a class="button primary" href="#models">Explore the models <span aria-hidden="true">↗</span></a>
           <a class="button secondary" href="https://github.com/su394611-del/MedSparse-Healthcare-LLM-From-Scratch" target="_blank" rel="noopener noreferrer">Browse source code <span aria-hidden="true">↗</span></a>
           <a class="button secondary report-toggle" href="https://su394611-del.github.io/research/medsparse-healthcare-2026/" data-open-report aria-controls="report" aria-expanded="false">Read the technical report <span class="report-caret" aria-hidden="true">▾</span></a>
         </div>
-        <a class="release-notice" href="#next-release"><span class="release-badge">NEXT RELEASE</span><span><time datetime="2026-11-25">Wednesday, 25 Nov 2026</time> · full MIRIAD fine-tune, after final testing</span></a>
+        <a class="release-notice" href="#release-03"><span class="release-badge">NEW RELEASE</span><span><time datetime="2026-11-25">25 Nov 2026</time> · MedSparse fine-tuned on MIRIAD, now on Hugging Face</span></a>
         <div class="hero-meta"><span class="inline-dot"></span> Native PyTorch implementation <span class="sep">•</span> Healthcare-only pretraining inputs <span class="sep">•</span> Fully trainable model</div>
       </div>
       <div class="hero-visual" role="img" aria-label="Diagram showing healthcare documents flowing into a tokenizer, then a sparse Mixture-of-Experts Transformer, followed by pretraining and medical fine-tuning releases">
@@ -100,28 +100,29 @@
     </section>
 
     <section class="section section-banded" id="training" aria-labelledby="training-title"><div class="container">
-      <div class="section-intro"><div><p class="kicker">02 / END-TO-END LIFECYCLE</p><h2 id="training-title">One architecture. <span class="gradient-text">Two training stages.</span></h2></div><p>The pretrained checkpoint becomes the starting point for medical supervised fine-tuning. The two model releases are separate artifacts with separate documentation.</p></div>
+      <div class="section-intro"><div><p class="kicker">02 / END-TO-END LIFECYCLE</p><h2 id="training-title">One architecture. <span class="gradient-text">Three training stages.</span></h2></div><p>Each checkpoint is the starting point for the next stage: biomedical pretraining, medical supervised fine-tuning, then a much larger fine-tune on MIRIAD. Each release is a separate artifact with its own documentation.</p></div>
       <div class="training-grid">
         <article class="training-card"><div class="training-heading"><span class="stage-number">00</span><span class="stage-label">DATA &amp; TOKENIZER</span></div><h3>Audit, tokenize, pack</h3><p>Screen approved healthcare corpora, train a biomedical BPE tokenizer, and form causal language-model training sequences.</p><div class="training-line"><span>Input</span><strong>Biomedical text</strong></div><div class="training-line"><span>Output</span><strong>Tokenizer + token IDs</strong></div></article>
         <article class="training-card emphasis"><div class="training-heading"><span class="stage-number">01</span><span class="stage-label">FROM-SCRATCH PRETRAINING</span></div><h3>Train from random weights</h3><p>Optimize the native MoE Transformer with next-token cross-entropy and an auxiliary expert-load balancing term.</p><div class="training-line"><span>Objective</span><strong>Causal language modeling</strong></div><div class="training-line"><span>Artifact</span><strong>Stage 1 checkpoint</strong></div></article>
         <article class="training-card"><div class="training-heading"><span class="stage-number">02</span><span class="stage-label">FULL-PARAMETER MEDICAL SFT</span></div><h3>Specialize on medical QA</h3><p>Initialize from Stage 1 weights, start a fresh optimizer, and supervise only assistant answers and end-of-sequence targets.</p><div class="training-line"><span>Objective</span><strong>Completion-only loss</strong></div><div class="training-line"><span>Artifact</span><strong>Stage 2 checkpoint</strong></div></article>
+        <article class="training-card"><div class="training-heading"><span class="stage-number">03</span><span class="stage-label">FULL-PARAMETER MIRIAD SFT</span></div><h3>Scale up on research Q&amp;A</h3><p>Initialize from Stage 2, fine-tune every weight on MIRIAD&#x27;s 5.8M question-answer pairs drawn from medical research papers, and hold out 2% of papers for testing.</p><div class="training-line"><span>Objective</span><strong>Completion-only loss</strong></div><div class="training-line"><span>Artifact</span><strong>Stage 3 checkpoint</strong></div></article>
       </div>
-      <div class="dataset-links"><span>Referenced datasets</span><a href="https://huggingface.co/datasets/common-pile/pubmed_filtered" target="_blank" rel="noopener noreferrer">PubMed filtered ↗</a><a href="https://huggingface.co/datasets/FreedomIntelligence/medical-o1-reasoning-SFT" target="_blank" rel="noopener noreferrer">Medical-o1 SFT ↗</a><span class="dataset-note">Dataset rights and privacy must be independently reviewed.</span></div>
+      <div class="dataset-links"><span>Referenced datasets</span><a href="https://huggingface.co/datasets/common-pile/pubmed_filtered" target="_blank" rel="noopener noreferrer">PubMed filtered ↗</a><a href="https://huggingface.co/datasets/FreedomIntelligence/medical-o1-reasoning-SFT" target="_blank" rel="noopener noreferrer">Medical-o1 SFT ↗</a><a href="https://huggingface.co/datasets/miriad/miriad-5.8M" target="_blank" rel="noopener noreferrer">MIRIAD 5.8M ↗</a><span class="dataset-note">Dataset rights and privacy must be independently reviewed.</span></div>
     </div></section>
 
     <section class="section container" id="models" aria-labelledby="models-title">
-      <div class="section-intro"><div><p class="kicker">03 / MODEL RELEASES</p><h2 id="models-title">Explore both <span class="gradient-text">Hugging Face models.</span></h2></div><p>Two checkpoints from the same custom architecture: the foundation model after healthcare pretraining and its medical instruction-tuned continuation.</p></div>
+      <div class="section-intro"><div><p class="kicker">03 / MODEL RELEASES</p><h2 id="models-title">Explore all three <span class="gradient-text">Hugging Face models.</span></h2></div><p>Three checkpoints from the same custom architecture: the foundation model after healthcare pretraining, its medical instruction-tuned continuation, and the newest release, fine-tuned on MIRIAD.</p></div>
       <div class="model-grid">
         <article class="model-card pretrained"><div class="model-top"><span class="model-number">RELEASE / 01</span><span class="model-type"><span aria-hidden="true">◇</span> PRETRAINED</span></div><div class="model-icon" aria-hidden="true">∑</div><h3>Healthcare Pretrained<br>From Scratch</h3><p>Randomly initialized PyTorch sparse-MoE language model pretrained on biomedical text. This is the Stage 1 checkpoint, before medical instruction tuning.</p><div class="model-tags"><span>Next-token LM</span><span>MoE</span><span>PyTorch</span></div><div class="model-links"><a class="button primary" href="https://huggingface.co/sudhanshu42844/medsparse-healthcare-pretrained-from-scratch" target="_blank" rel="noopener noreferrer">🤗 Open Hugging Face <span aria-hidden="true">↗</span></a><a href="https://huggingface.co/sudhanshu42844/medsparse-healthcare-pretrained-from-scratch/blob/main/README.md" target="_blank" rel="noopener noreferrer">Model card ↗</a><a href="https://huggingface.co/sudhanshu42844/medsparse-healthcare-pretrained-from-scratch/tree/main" target="_blank" rel="noopener noreferrer">Model files ↗</a></div></article>
         <article class="model-card finetuned"><div class="model-top"><span class="model-number">RELEASE / 02</span><span class="model-type"><span aria-hidden="true">✳</span> FULL SFT</span></div><div class="model-icon" aria-hidden="true">✳</div><h3>Healthcare Medical<br>Supervised Fine-Tuning</h3><p>Stage 1 model weights adapted with full-parameter medical SFT on instruction/response examples. Prompt tokens are excluded from the supervised completion loss.</p><div class="model-tags"><span>Medical QA</span><span>Full weights</span><span>Completion loss</span></div><div class="model-links"><a class="button primary" href="https://huggingface.co/sudhanshu42844/medsparse-healthcare-medical-sft" target="_blank" rel="noopener noreferrer">🤗 Open Hugging Face <span aria-hidden="true">↗</span></a><a href="https://huggingface.co/sudhanshu42844/medsparse-healthcare-medical-sft/blob/main/README.md" target="_blank" rel="noopener noreferrer">Model card ↗</a><a href="https://huggingface.co/sudhanshu42844/medsparse-healthcare-medical-sft/tree/main" target="_blank" rel="noopener noreferrer">Model files ↗</a></div></article>
+        <article class="model-card finetuned miriad" id="release-03"><div class="model-top"><span class="model-number">RELEASE / 03 · NEW · 25 NOV 2026</span><span class="model-type"><span aria-hidden="true">✳</span> MIRIAD SFT</span></div><div class="model-icon" aria-hidden="true">✚</div><h3>Healthcare MIRIAD<br>Supervised Fine-Tuning</h3><p>The Stage 2 model, fine-tuned on all weights for 1.5M optimizer steps on MIRIAD, 5.8M Q&amp;A pairs from medical research papers. It answers each question on topic in fluent English, which the earlier releases could not do, but its answers are often factually wrong: see the held-out results below.</p><div class="model-tags"><span>MIRIAD 5.8M</span><span>Full weights</span><span>Paper-level held-out split</span><span>Apache-2.0</span></div><div class="model-links"><a class="button primary" href="https://huggingface.co/sudhanshu42844/medsparse-healthcare-miriad-sft" target="_blank" rel="noopener noreferrer">🤗 Open Hugging Face <span aria-hidden="true">↗</span></a><a href="https://huggingface.co/sudhanshu42844/medsparse-healthcare-miriad-sft/blob/main/README.md" target="_blank" rel="noopener noreferrer">Model card ↗</a><a href="#miriad-results">Held-out results ↓</a><a href="/playground/?model=miriad">Try it in the playground ↗</a></div></article>
       </div>
-      <div class="release-next" id="next-release" role="note" aria-label="Upcoming model release"><span class="release-badge">RELEASE / 03 · NEXT</span><p><strong>Wednesday, 25 November 2026.</strong> A new MedSparse Healthcare checkpoint, fully fine-tuned on the 5.8M-pair MIRIAD medical Q&amp;A dataset, will be published on Hugging Face after final testing on held-out questions. The two releases above stay available.</p></div>
-      <p class="model-footnote">Both releases use a custom native PyTorch model loader, not necessarily the standard Hugging Face <code>AutoModelForCausalLM</code> API. Model availability depends on repository visibility. These research artifacts are not validated for clinical diagnosis or treatment.</p>
+      <p class="model-footnote">All three releases use a custom native PyTorch model loader, not necessarily the standard Hugging Face <code>AutoModelForCausalLM</code> API. Model availability depends on repository visibility. These research artifacts are not validated for clinical diagnosis or treatment.</p>
       <div class="ss-try" id="try-live" v-pre>
-        <h3 class="ss-try-title">Try both models <span class="gradient-text">in your browser.</span></h3>
-        <p class="ss-try-note">Both checkpoints run locally with plain JavaScript after a one-time 155 MB download per model. Nothing you type is sent to a server.</p>
-        <iframe class="ss-try-frame" id="ss-try-frame" loading="lazy" src="/playground/?model=sft" title="Model playground: try the MedSparse Healthcare models"></iframe>
-        <p class="ss-try-fallback"><a href="/playground/?model=sft">Open the playground in a full page ↗</a></p>
+        <h3 class="ss-try-title">Try the models <span class="gradient-text">in your browser.</span></h3>
+        <p class="ss-try-note">Each checkpoint runs locally with plain JavaScript after a one-time 155 MB download. The playground opens on the new MIRIAD release. Nothing you type is sent to a server.</p>
+        <iframe class="ss-try-frame" id="ss-try-frame" loading="lazy" src="/playground/?model=miriad" title="Model playground: try the MedSparse Healthcare models"></iframe>
+        <p class="ss-try-fallback"><a href="/playground/?model=miriad">Open the playground in a full page ↗</a></p>
 <section aria-labelledby="playground-install-title" id="playground-install">
   <h4 id="playground-install-title">Run the playground on your computer</h4>
   <p>With Python 3.10 or later, run these commands in your terminal.</p>
@@ -269,6 +270,48 @@ The authors declare that the study of the study, the study is a role of the manu
       <div class="me-links"><a href="https://su394611-del.github.io/research/medsparse-healthcare-2026/">Technical report (PDF)</a><a href="https://doi.org/10.5281/zenodo.24461542" target="_blank" rel="noopener noreferrer">DOI · 10.5281/zenodo.24461542 ↗</a><a href="eval/results.json">results.json</a><a href="https://github.com/su394611-del/MedSparse-Healthcare-LLM-From-Scratch/tree/main/eval" target="_blank" rel="noopener noreferrer">Evaluation code ↗</a><a href="#try-live">Try the models</a></div>
     </section>
     <!-- model-eval:end -->
+    <section class="section container" id="miriad-results" aria-labelledby="miriad-results-title" v-pre>
+      <div class="section-intro"><div><p class="kicker">04 / MODEL EVALUATION · RELEASE 03</p><h2 id="miriad-results-title">MIRIAD fine-tune, <span class="gradient-text">checked on held-out papers.</span></h2></div><p>15 MIRIAD questions from 15 different papers that were held out of training, answered by the released checkpoint and by the Medical SFT release it started from. Evaluated 2026-11-25.</p></div>
+      <div class="me-stats">
+        <div class="me-stat"><span class="me-label">Perplexity on MIRIAD answers</span><b class="me-good">9.5 <small>after MIRIAD</small></b><p>383 before MIRIAD (the Medical SFT release). Reference answers only.</p></div>
+        <div class="me-stat"><span class="me-label">Word-overlap F1</span><b>0.35 <small>after</small></b><p>0.19 before. A rough lexical score, not a measure of correctness.</p></div>
+        <div class="me-stat"><span class="me-label">Answers judged correct</span><b>3 <small>of 15</small></b><p>Correct or mostly correct in an informal read-through. 5 were vague or incomplete, 7 were wrong.</p></div>
+        <div class="me-stat"><span class="me-label">Best validation loss</span><b>2.19 <small>CE</small></b><p>Completion-only cross-entropy on 64 held-out examples, at the released checkpoint.</p></div>
+      </div>
+      <div class="me-table-wrap">
+        <table class="me-table me-table-kv">
+          <caption>Training run behind Release 03, from the checkpoint&#x27;s own training state.</caption>
+          <thead><tr><th scope="col">Setting</th><th scope="col">Value</th></tr></thead>
+          <tbody>
+            <tr><td>Data</td><td>MIRIAD 5.8M (question → answer), 5,821,948 pairs</td></tr>
+            <tr><td>Held-out split</td><td>2% of papers (seed 42); every Q&amp;A from a held-out paper is excluded</td></tr>
+            <tr><td>Optimizer steps / examples processed</td><td><b>1,507,000</b> steps · about 6.03M examples (batch 1 × gradient accumulation 4)</td></tr>
+            <tr><td>Sequence length</td><td>192 tokens · 6.6% of training answers (398,337) were truncated to fit</td></tr>
+            <tr><td>Optimizer and hardware</td><td>AdamW, lr 2e-5, FP32, on a single consumer-grade GPU</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="me-grid me-grid-single">
+        <article class="me-samples" aria-labelledby="miriad-samples-title">
+          <h3 id="miriad-samples-title">Two unedited answers (greedy decoding)</h3>
+          <p>One the model got right and one it got wrong, both on held-out questions. Before MIRIAD, the model gave the same templated reply to every question.</p>
+          <p class="me-q"><strong>Held-out question:</strong> What are the risk factors associated with coronary heart disease (CHD)?</p><div class="me-sample"><h4>MIRIAD reference</h4><p>Risk factors associated with coronary heart disease (CHD) include smoking, hypercholesterolemia, hypertension, and diabetes. Psychosocial risk factors have also been identified as contributors to the development of CHD.</p></div><div class="me-sample"><h4>MedSparse · MIRIAD SFT (correct)</h4><p>Risk factors for CHD include hypertension, diabetes mellitus (DM), and dyslipidemia. These conditions are associated with an increased risk of developing CHD.</p></div>
+          <p class="me-q"><strong>Held-out question:</strong> How does the stroke rate affect the average boat speed in rowing?</p><div class="me-sample"><h4>MIRIAD reference</h4><p>The stroke rate in rowing can affect the average boat speed. When the recovery phase duration is reduced while the drive phase duration remains unchanged, the stroke rate increases, leading to an increase in average boat speed. Similarly, reducing the duration of both the drive and recovery phases can also increase the stroke rate and average boat speed.</p></div><div class="me-sample"><h4>MedSparse · MIRIAD SFT (wrong: confuses rowing &#x201C;stroke&#x201D; with the disease)</h4><p>The stroke rate is a significant predictor of the average boat speed in rowing. A higher stroke rate is associated with a lower average boat speed, indicating that individuals who have experienced a stroke are more likely to experience a decline in their ability to walk.</p></div>
+        </article>
+      </div>
+      <details class="me-method">
+        <summary>How this was measured, and the limits</summary>
+        <ul>
+          <li><strong>Held-out data.</strong> The training script&#x27;s own paper-level split (seed 42, 2%), one question per held-out paper, spread across the 64 MIRIAD shards.</li>
+          <li><strong>Scoring.</strong> PyTorch on CPU with the project&#x27;s native engine and training prompt format. Perplexity is on MIRIAD&#x27;s reference answers (192-token window). Greedy decoding, repetition penalty 1.2, up to 120 new tokens. These numbers use a different dataset, window and engine from the 20 Nov table above, so they are not directly comparable with it.</li>
+          <li><strong>Correctness.</strong> The read-through is informal and not an expert clinical review. Common errors: wrong facts stated confidently, word-sense confusions and a repeated word in place of a list.</li>
+          <li><strong>Data coverage.</strong> Training resumed several times with a shuffled streaming reader, and the resume skip did not line up with the shuffled stream: the row counter overshot MIRIAD by 328,159 rows. Some pairs were trained more than once and full coverage is not verified. The held-out filter was applied to every row, so no held-out paper entered training.</li>
+          <li><strong>Small sample.</strong> 15 questions is a development check, not a benchmark. Larger held-out and standard-benchmark results (for example MedQA or PubMedQA) are next.</li>
+          <li><strong>Not a clinical evaluation.</strong> Never use this model for diagnosis, treatment or any decision about a real person.</li>
+        </ul>
+      </details>
+      <div class="me-links"><a href="https://huggingface.co/sudhanshu42844/medsparse-healthcare-miriad-sft" target="_blank" rel="noopener noreferrer">Model card and weights ↗</a><a href="/playground/?model=miriad">Try it in the playground ↗</a></div>
+    </section>
 
     <section class="section section-banded" id="architecture" aria-labelledby="architecture-title"><div class="container">
       <div class="section-intro"><div><p class="kicker">05 / ARCHITECTURE &amp; DESIGN</p><h2 id="architecture-title">Architecture you can <span class="gradient-text">inspect.</span></h2></div><p>Switch between high-level architecture, decoder internals, and the checkpoint lifecycle. Diagrams use editable Mermaid.js source.</p></div>
