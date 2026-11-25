@@ -7,7 +7,7 @@
     hld: {
       file: 'High-Level-Architecture.mmd',
       title: 'High-Level Architecture',
-      description: 'Biomedical datasets, audited tokenizer, random-initialized pretraining, full medical SFT and validation.'
+      description: 'Biomedical datasets, audited tokenizer, random-initialized pretraining, full medical SFT, MIRIAD SFT and validation.'
     },
     lld: {
       file: 'Low-Level-Architecture.mmd',
@@ -17,7 +17,7 @@
     lifecycle: {
       file: 'Training-and-Checkpoint-Lifecycle.mmd',
       title: 'Training & Checkpoint Lifecycle',
-      description: 'Checkpoint transfer between pretraining and SFT, correct resume semantics, and evaluation.'
+      description: 'Checkpoint transfer from pretraining to medical SFT to MIRIAD SFT, correct resume semantics, and evaluation.'
     }
   };
   let mermaidPromise = null;

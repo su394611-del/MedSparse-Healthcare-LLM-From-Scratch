@@ -60,8 +60,8 @@
         </div>
         <div class="hero-meta"><span class="inline-dot"></span> Native PyTorch implementation <span class="sep">•</span> Healthcare-only pretraining inputs <span class="sep">•</span> Fully trainable model</div>
       </div>
-      <div class="hero-visual" role="img" aria-label="Diagram showing healthcare documents flowing into a tokenizer, then a sparse Mixture-of-Experts Transformer, followed by pretraining and medical fine-tuning releases">
-        <div class="visual-top"><span><i class="pulse"></i> SYSTEM / PIPELINE</span><span>01 → 05</span></div>
+      <div class="hero-visual" role="img" aria-label="Diagram showing healthcare documents flowing into a tokenizer, then a sparse Mixture-of-Experts Transformer, followed by pretraining, medical fine-tuning and MIRIAD fine-tuning releases">
+        <div class="visual-top"><span><i class="pulse"></i> SYSTEM / PIPELINE</span><span>01 → 06</span></div>
         <div class="visual-steps">
           <div class="visual-step"><span class="step-badge">01</span><div><small>INGESTION</small><strong>Healthcare corpus</strong><em>Biomedical text &amp; source checks</em></div><span class="step-symbol">▤</span></div>
           <div class="visual-join"></div>
@@ -69,7 +69,7 @@
           <div class="visual-join"></div>
           <div class="visual-step primary-step"><span class="step-badge">03</span><div><small>TRANSFORMER</small><strong>Sparse MoE decoder</strong><em>Top-2 routing · 4 experts</em></div><span class="step-symbol">✳</span></div>
           <div class="visual-split"><span></span><span></span></div>
-          <div class="visual-outputs"><div><small>04 / PRETRAIN</small><strong>Stage 1</strong><em>Random initialization</em></div><div><small>05 / MEDICAL SFT</small><strong>Stage 2</strong><em>Checkpoint continuation</em></div></div>
+          <div class="visual-outputs"><div><small>04 / PRETRAIN</small><strong>Stage 1</strong><em>Random initialization</em></div><div><small>05 / MEDICAL SFT</small><strong>Stage 2</strong><em>Checkpoint continuation</em></div><div><small>06 / MIRIAD SFT</small><strong>Stage 3</strong><em>5.8M research Q&amp;A</em></div></div>
         </div>
         <div class="visual-bottom"><span>PYTORCH</span><span>TRANSFORMERS</span><span>MOE ROUTING</span><span>HUGGING FACE</span></div>
       </div>
@@ -77,7 +77,7 @@
 
     <section class="container report-panel" id="report" aria-labelledby="report-panel-title" hidden v-pre>
       <div class="report-embed">
-        <div class="report-embed-head"><h2 id="report-panel-title">Technical report <span>· Version 1.0 · 25 Nov 2026</span></h2><div class="report-embed-actions"><a href="https://su394611-del.github.io/research/medsparse-healthcare-2026/">Open the full page ↗</a><button class="report-close" type="button" data-close-report>Close <span aria-hidden="true">✕</span></button></div></div>
+        <div class="report-embed-head"><h2 id="report-panel-title">Technical report <span>· Version 1.0.1 · 25 Nov 2026</span></h2><div class="report-embed-actions"><a href="https://su394611-del.github.io/research/medsparse-healthcare-2026/">Open the full page ↗</a><button class="report-close" type="button" data-close-report>Close <span aria-hidden="true">✕</span></button></div></div>
         <iframe class="report-iframe" id="ss-report-frame" data-src="https://su394611-del.github.io/research/embed/" title="MedSparse Healthcare technical report"></iframe>
       </div>
     </section>
@@ -218,8 +218,8 @@ medsparse-playground</code></pre>
 </svg></div>
           <div>
             <table class="me-stage-table"><thead><tr><th scope="col">Checkpoint</th><th scope="col">Step</th><th scope="col">PubMed loss</th><th scope="col">Q&amp;A loss</th></tr></thead><tbody><tr><td>Untrained</td><td>0</td><td><b>10.31</b><small>uniform guess</small></td><td><b>10.31</b><small>uniform guess</small></td></tr><tr><td>Pretrained</td><td>5,000</td><td><b>6.35</b><small>perplexity 572</small></td><td><b>6.54</b><small>perplexity 692</small></td></tr><tr><td>Medical SFT</td><td>7,000</td><td><b>6.50</b><small>perplexity 667</small></td><td><b>5.53</b><small>perplexity 253</small></td></tr></tbody></table>
-            <p class="me-train-note" data-chart-style="border-style-solid">Stage 1 processed 2.56 million tokens (5,000 steps × 512 tokens, per its training manifest). Pretraining cut PubMed loss from 10.31 to 6.35 nats per token. SFT then lowered Q&amp;A loss from 6.54 to 5.53 while PubMed loss rose to 6.50: the model specialised in the Q&amp;A format.</p>
-            <p class="me-train-note">Per-step loss was printed to the console during these two runs and not saved (the run folders keep only the final checkpoint and a manifest), so there is no step-by-step curve to show yet. The training scripts now write every logged step to <code>metrics.jsonl</code>; the next run will publish its full curve here.</p>
+            <p class="me-train-note" data-chart-style="border-style-solid">Stage 1 processed 2.56 million tokens (5,000 steps × 512 tokens, per its training manifest). Pretraining cut PubMed loss from 10.31 to 6.35 nats per token. SFT then lowered Q&amp;A loss from 6.54 to 5.53 while PubMed loss rose to 6.50: the model specialized in the Q&amp;A format.</p>
+            <p class="me-train-note">Per-step loss was printed to the console during these two runs and not saved (the run folders keep only the final checkpoint and a manifest), so there is no step-by-step curve for them. The training scripts now write every logged step to <code>metrics.jsonl</code>. Results for Stage 3 (MIRIAD SFT) are in the next section.</p>
           </div>
         </div>
       </article>
@@ -240,7 +240,7 @@ medsparse-playground</code></pre>
         </article>
         <article class="me-card">
           <h3>Sample answers (greedy decoding)</h3>
-          <p>Unedited greedy outputs on held-out questions. Greedy decoding exposes what each stage learned most strongly: the pretrained model loops on the author-declaration boilerplate common in PubMed Central articles, and the SFT model loops on medical-o1's most frequent opening. The playground samples with a repetition penalty instead.</p>
+          <p>Unedited greedy outputs on held-out questions. Greedy decoding exposes what each stage learned most strongly: the pretrained model loops on the author-declaration boilerplate common in PubMed Central articles, and the SFT model loops on medical-o1's most frequent opening. The playground samples with a repetition penalty instead. Questions are shown exactly as they appear in their datasets, typos included.</p>
           <p class="me-q"><strong>Held-out question 1:</strong> A 70 year old male patient presented to the emergency depament with pain in epigastrium and difficulty in breathing for 6 hours. On examination, his hea rate was chest examination was normal. The patient has been taking omeprazole for gastresophageal reflux disease for last 6 months. What should be the intial investigation :
 A. An ECG
 B. An upper GI endoscopy
@@ -259,14 +259,14 @@ The authors declare that the study of the study, the study is a role of the manu
         <summary>How this was measured, and the limits</summary>
         <ul>
           <li><strong>What it means.</strong> Medical SFT lowers held-out Q&amp;A perplexity by 64% (692 → 253; paired 95% CI of the ratio 0.34–0.39). On PubMed text the pretrained checkpoint stays better (572 vs 667): SFT trades some general biomedical fit for the Q&amp;A format. On MedMCQA the SFT model is not distinguishable from chance and the pretrained model is slightly above chance, but below always answering the most common letter (38%): expected for 38.8M parameters. The clearest improvement to make next: only 9% of held-out Q&amp;A examples keep the whole question inside the 128-token training window, so SFT mostly learns answer style without the question. Fine-tuning with longer sequences (for example 512 tokens) should help most.</li>
-          <li><strong>Held-out data.</strong> PubMed: the first 40 articles in <code>licensed_pubmed-0000.json.gz</code> that pass the training filters (clinical keywords, CC0/CC-BY licence) and fall in the 2% validation partition of <code>stable_partition</code> (2,407 scanned). Q&amp;A: the first 80 medical-o1 (en) rows in the 5% validation bucket of <code>bucket_for_question</code>. Both splits use BLAKE2b with seed 42, re-implemented in JavaScript and checked against Python's hashlib.</li>
+          <li><strong>Held-out data.</strong> PubMed: the first 40 articles in <code>licensed_pubmed-0000.json.gz</code> that pass the training filters (clinical keywords, CC0/CC-BY license) and fall in the 2% validation partition of <code>stable_partition</code> (2,407 scanned). Q&amp;A: the first 80 medical-o1 (en) rows in the 5% validation bucket of <code>bucket_for_question</code>. Both splits use BLAKE2b with seed 42, re-implemented in JavaScript and checked against Python's hashlib.</li>
           <li><strong>Scoring.</strong> PubMed uses the packed pretraining window (128 scored tokens per article, no &lt;bos&gt;). Q&amp;A mirrors <code>tokenize_example(seq_len=128)</code>: the chat template, answer-only loss, and the prompt trimmed from the left. Because answers are long, only 9% of these examples keep the whole question inside the 128-token window, which is also true of training.</li>
           <li><strong>MedMCQA.</strong> The first 150 validation questions; each option is scored by its mean log-probability per token after the question (cloze style, options not shown). Wilson 95% intervals.</li>
           <li><strong>Engine.</strong> The playground's float32 JavaScript implementation of the published weights (Hugging Face revisions <code>bb8e91ae</code> and <code>0a157beb</code>), not PyTorch. Uncertainty: 2,000-sample bootstrap over items.</li>
-          <li><strong>Not a clinical evaluation.</strong> These numbers measure language modelling on held-out text. They say nothing about medical safety or correctness.</li>
+          <li><strong>Not a clinical evaluation.</strong> These numbers measure language modeling on held-out text. They say nothing about medical safety or correctness.</li>
         </ul>
       </details>
-      <div class="me-links"><a href="https://su394611-del.github.io/research/medsparse-healthcare-2026/">Technical report (PDF)</a><a href="https://doi.org/10.5281/zenodo.24461541" target="_blank" rel="noopener noreferrer">DOI · 10.5281/zenodo.24461541 ↗</a><a href="eval/results.json">results.json</a><a href="https://github.com/su394611-del/MedSparse-Healthcare-LLM-From-Scratch/tree/main/eval" target="_blank" rel="noopener noreferrer">Evaluation code ↗</a><a href="#try-live">Try the models</a></div>
+      <div class="me-links"><a href="https://su394611-del.github.io/research/medsparse-healthcare-2026/">Technical report</a><a href="https://doi.org/10.5281/zenodo.24461541" target="_blank" rel="noopener noreferrer">DOI · 10.5281/zenodo.24461541 ↗</a><a href="eval/results.json">results.json</a><a href="https://github.com/su394611-del/MedSparse-Healthcare-LLM-From-Scratch/tree/main/eval" target="_blank" rel="noopener noreferrer">Evaluation code ↗</a><a href="#try-live">Try the models</a></div>
     </section>
     <!-- model-eval:end -->
     <section class="section container" id="miriad-results" aria-labelledby="miriad-results-title" v-pre>
@@ -326,7 +326,7 @@ The authors declare that the study of the study, the study is a role of the manu
       <details class="me-method">
         <summary>How this was measured, and the limits</summary>
         <ul>
-          <li><strong>What it means.</strong> MIRIAD training made the model far better at predicting held-out medical answers (Q&amp;A perplexity 253 → 59.6) without hurting PubMed text, which it slightly improved. Multiple-choice accuracy did not move meaningfully: at 38.8M parameters, recognising the right option is still close to guessing.</li>
+          <li><strong>What it means.</strong> MIRIAD training made the model far better at predicting held-out medical answers (Q&amp;A perplexity 253 → 59.6) without hurting PubMed text: its PubMed perplexity fell from 667 to 586, a difference within noise. Multiple-choice accuracy did not move meaningfully: at 38.8M parameters, recognizing the right option is still close to guessing.</li>
           <li><strong>Same items, same engine.</strong> PubMed, Q&amp;A and MedMCQA use the identical held-out row indices and the playground&#x27;s float32 JavaScript engine from the 20 Nov run. As a check, Medical SFT was re-scored in the same run and reproduced its published numbers exactly (252.86 and 667.04). Model revisions: MIRIAD SFT <code>b65a4702</code>, Medical SFT <code>7222352b</code>. Harness: <code>eval/browser/driver_miriad.js</code>, <code>aggregate_miriad.js</code>.</li>
           <li><strong>MIRIAD questions.</strong> 15 questions from the training script&#x27;s own paper-level held-out split (seed 42, 2%), one per paper, scored in PyTorch on CPU with a 192-token window. The correctness read-through is informal, not an expert clinical review.</li>
           <li><strong>Data coverage.</strong> Training resumed several times with a shuffled streaming reader, and the resume skip did not line up with the shuffled stream: the row counter overshot MIRIAD by 328,159 rows. Some pairs were trained more than once and full coverage is not verified. The held-out filter was applied to every row.</li>
@@ -344,7 +344,7 @@ The authors declare that the study of the study, the study is a role of the manu
         <button type="button" role="tab" id="diagram-tab-lld" data-diagram="lld" aria-controls="diagram-render" aria-selected="false" tabindex="-1">Low-level design</button>
         <button type="button" role="tab" id="diagram-tab-lifecycle" data-diagram="lifecycle" aria-controls="diagram-render" aria-selected="false" tabindex="-1">Training lifecycle</button>
       </div><div class="diagram-actions"><a id="diagram-download" href="./diagrams/High-Level-Architecture.mmd" download>Download .mmd ↧</a><button type="button" id="copy-diagram-button" @click="copyDiagram">Copy source</button></div></div>
-      <div class="diagram-details"><h3 id="diagram-title">High-Level Architecture</h3><p id="diagram-description">Datasets, tokenization, random-initialized pretraining, full medical SFT and validation.</p></div>
+      <div class="diagram-details"><h3 id="diagram-title">High-Level Architecture</h3><p id="diagram-description">Biomedical datasets, audited tokenizer, random-initialized pretraining, full medical SFT, MIRIAD SFT and validation.</p></div>
       <div class="diagram-render" id="diagram-render" role="tabpanel" aria-labelledby="diagram-tab-hld" tabindex="0" aria-live="polite"><p class="diagram-message" id="diagram-message">Loading architecture diagram…</p><div id="diagram-svg" role="img" aria-label="Rendered Mermaid.js architecture diagram"></div></div>
       <details class="diagram-source-details"><summary>View the editable Mermaid.js source</summary><pre id="diagram-source">Select a diagram to load its source.</pre></details>
       <p class="diagram-help" id="diagram-help" role="status">Mermaid.js diagrams load when connected to the internet. Direct source files remain available.</p>
@@ -363,7 +363,7 @@ The authors declare that the study of the study, the study is a role of the manu
       </div>
     </section>
 
-    <section class="container closing"><div><p class="kicker">OPEN ENGINEERING / REPRODUCIBLE DESIGN</p><h2>Read the code.<br><span class="gradient-text">Trace the weights.</span></h2><p>Learn how a native sparse Mixture-of-Experts language model progresses from randomly initialized parameters to biomedical pretraining and full medical SFT.</p></div><div class="closing-buttons"><a class="button primary" href="https://github.com/su394611-del/MedSparse-Healthcare-LLM-From-Scratch" target="_blank" rel="noopener noreferrer">Explore GitHub ↗</a><a class="button secondary" href="#models">View model releases ↑</a></div></section>
+    <section class="container closing"><div><p class="kicker">OPEN ENGINEERING / REPRODUCIBLE DESIGN</p><h2>Read the code.<br><span class="gradient-text">Trace the weights.</span></h2><p>Learn how a native sparse Mixture-of-Experts language model progresses from randomly initialized parameters to biomedical pretraining, full medical SFT and MIRIAD fine-tuning.</p></div><div class="closing-buttons"><a class="button primary" href="https://github.com/su394611-del/MedSparse-Healthcare-LLM-From-Scratch" target="_blank" rel="noopener noreferrer">Explore GitHub ↗</a><a class="button secondary" href="#models">View model releases ↑</a></div></section>
   <section aria-labelledby="contact-heading" class="ss-contact" id="contact" v-pre>
   <div class="container ss-contact-inner">
   <div class="ss-contact-copy"><p class="ss-contact-kicker">Get in touch</p><h2 id="contact-heading">Questions about <span class="ss-contact-grad">this project?</span></h2><p>Ask about the code, a collaboration or an AI engineering role. Messages go straight to my inbox, and I'll reply by email.</p><p class="ss-contact-more">More work: <a href="https://su394611-del.github.io/">Sudhanshu Shukla's AI Lab ↗</a></p></div>

@@ -1,6 +1,7 @@
 flowchart TB
     HFS[("HF: common-pile/pubmed_filtered<br/>biomedical research text")]
     HFM[("HF: FreedomIntelligence/<br/>medical-o1-reasoning-SFT")]
+    HFR[("HF: miriad/miriad-5.8M<br/>research Q&A pairs")]
 
     subgraph PREP["Stage 0 · Data and tokenizer preparation"]
       AUDIT["Dataset provenance, licensing<br/>and clinical-text screening"]
@@ -30,6 +31,16 @@ flowchart TB
       LOAD --> UPDATE --> CK2
     end
 
+    subgraph MIRIAD["Stage 3 · Full-parameter MIRIAD SFT"]
+      SPLIT["Paper-level held-out split<br/>2% of papers, seed 42"]
+      MASK3["Same template, 192-token window<br/>completion-only loss masks"]
+      LOAD3["Initialize with Stage 2 weights<br/>and a fresh AdamW optimizer"]
+      UPDATE3["Update all model parameters<br/>1,507,000 optimizer steps"]
+      CK3[("MIRIAD SFT checkpoint<br/>lowest validation loss")]
+      SPLIT --> MASK3 --> UPDATE3
+      LOAD3 --> UPDATE3 --> CK3
+    end
+
     subgraph VERIFY["Validation and responsible evaluation"]
       METRICS["Held-out CE and perplexity<br/>training and checkpoint metrics"]
       REVIEW["Independent medical quality,<br/>privacy and safety review required"]
@@ -43,11 +54,15 @@ flowchart TB
     CK1 --> LOAD
     HFM --> FORMAT
     CK1 --> METRICS
+    CK2 --> LOAD3
+    HFR --> SPLIT
+    TOK --> MASK3
     CK2 --> METRICS
+    CK3 --> METRICS
 
     classDef source fill:#e6f2ff,stroke:#5583b2,color:#173b61
     classDef checkpoint fill:#ebf8ec,stroke:#4d9869,color:#235d39
     classDef caution fill:#fff1dd,stroke:#bc8241,color:#75451b
-    class HFS,HFM source
-    class TOK,CK1,CK2 checkpoint
+    class HFS,HFM,HFR source
+    class TOK,CK1,CK2,CK3 checkpoint
     class REVIEW caution

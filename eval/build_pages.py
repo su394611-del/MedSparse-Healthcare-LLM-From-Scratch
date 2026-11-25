@@ -123,8 +123,8 @@ else:
                    '2,000 medical SFT steps. Dots are measurements with their 95% intervals; dashed lines only connect them.')
     train_charts = legend + training_chart.stage_chart(RES)
     train_note = ('<p class="me-train-note">Per-step loss was printed to the console during these two runs and not saved (the run folders keep only the final checkpoint and a manifest), so there is no step-by-step '
-                  'curve to show yet. The training scripts now write every logged step to <code>metrics.jsonl</code>; the next run will '
-                  'publish its full curve here.</p>')
+                  'curve for them. The training scripts now write every logged step to <code>metrics.jsonl</code>. Results for Stage 3 '
+                  '(MIRIAD SFT) are in the next section.</p>')
 train_card = f"""<article class="me-train" aria-labelledby="training-progress-title">
         <h3 id="training-progress-title">Training progress</h3>
         <p>{train_intro}</p>
@@ -132,7 +132,7 @@ train_card = f"""<article class="me-train" aria-labelledby="training-progress-ti
           <div class="me-chart-wrap">{train_charts}</div>
           <div>
             <table class="me-stage-table"><thead><tr><th scope="col">Checkpoint</th><th scope="col">Step</th><th scope="col">PubMed loss</th><th scope="col">Q&amp;A loss</th></tr></thead><tbody>{stage_rows}</tbody></table>
-            <p class="me-train-note" style="border-style:solid">Stage 1 processed 2.56 million tokens (5,000 steps × 512 tokens, per its training manifest). Pretraining cut PubMed loss from {uni:.2f} to {PRE['pubmedHeldOut']['meanNll']:.2f} nats per token. SFT then lowered Q&amp;A loss from {PRE['medicalQaHeldOut']['meanNll']:.2f} to {SFT['medicalQaHeldOut']['meanNll']:.2f} while PubMed loss rose to {SFT['pubmedHeldOut']['meanNll']:.2f}: the model specialised in the Q&amp;A format.</p>
+            <p class="me-train-note" style="border-style:solid">Stage 1 processed 2.56 million tokens (5,000 steps × 512 tokens, per its training manifest). Pretraining cut PubMed loss from {uni:.2f} to {PRE['pubmedHeldOut']['meanNll']:.2f} nats per token. SFT then lowered Q&amp;A loss from {PRE['medicalQaHeldOut']['meanNll']:.2f} to {SFT['medicalQaHeldOut']['meanNll']:.2f} while PubMed loss rose to {SFT['pubmedHeldOut']['meanNll']:.2f}: the model specialized in the Q&amp;A format.</p>
             {train_note}
           </div>
         </div>
@@ -176,7 +176,7 @@ mix_section = f"""<!-- model-eval:start -->
         </article>
         <article class="me-card">
           <h3>Sample answers (greedy decoding)</h3>
-          <p>Unedited greedy outputs on held-out questions. Greedy decoding exposes what each stage learned most strongly: the pretrained model loops on the author-declaration boilerplate common in PubMed Central articles, and the SFT model loops on medical-o1's most frequent opening. The playground samples with a repetition penalty instead.</p>
+          <p>Unedited greedy outputs on held-out questions. Greedy decoding exposes what each stage learned most strongly: the pretrained model loops on the author-declaration boilerplate common in PubMed Central articles, and the SFT model loops on medical-o1's most frequent opening. The playground samples with a repetition penalty instead. Questions are shown exactly as they appear in their datasets, typos included.</p>
           {sample_html}
         </article>
       </div>
@@ -184,14 +184,14 @@ mix_section = f"""<!-- model-eval:start -->
         <summary>How this was measured, and the limits</summary>
         <ul>
           <li><strong>What it means.</strong> {qa_sentence()} {pm_sentence()} On MedMCQA the SFT model is {mcq_verdict(sm)} and the pretrained model is {mcq_verdict(pm)}: expected for 38.8M parameters. The clearest improvement to make next: only {pc(n['qa']['questionFullyKeptShare'], 0)} of held-out Q&amp;A examples keep the whole question inside the 128-token training window, so SFT mostly learns answer style without the question. Fine-tuning with longer sequences (for example 512 tokens) should help most.</li>
-          <li><strong>Held-out data.</strong> PubMed: the first {n['pubmed']['selected']:d} articles in <code>licensed_pubmed-0000.json.gz</code> that pass the training filters (clinical keywords, CC0/CC-BY licence) and fall in the 2% validation partition of <code>stable_partition</code> ({n['pubmed']['scanned']:,} scanned). Q&amp;A: the first {n['qa']['selected']:d} medical-o1 (en) rows in the 5% validation bucket of <code>bucket_for_question</code>. Both splits use BLAKE2b with seed 42, re-implemented in JavaScript and checked against Python's hashlib.</li>
+          <li><strong>Held-out data.</strong> PubMed: the first {n['pubmed']['selected']:d} articles in <code>licensed_pubmed-0000.json.gz</code> that pass the training filters (clinical keywords, CC0/CC-BY license) and fall in the 2% validation partition of <code>stable_partition</code> ({n['pubmed']['scanned']:,} scanned). Q&amp;A: the first {n['qa']['selected']:d} medical-o1 (en) rows in the 5% validation bucket of <code>bucket_for_question</code>. Both splits use BLAKE2b with seed 42, re-implemented in JavaScript and checked against Python's hashlib.</li>
           <li><strong>Scoring.</strong> PubMed uses the packed pretraining window (128 scored tokens per article, no &lt;bos&gt;). Q&amp;A mirrors <code>tokenize_example(seq_len=128)</code>: the chat template, answer-only loss, and the prompt trimmed from the left. Because answers are long, only {pc(n['qa']['questionFullyKeptShare'], 0)} of these examples keep the whole question inside the 128-token window, which is also true of training.</li>
           <li><strong>MedMCQA.</strong> The first {sm['items']:d} validation questions; each option is scored by its mean log-probability per token after the question (cloze style, options not shown). Wilson 95% intervals.</li>
           <li><strong>Engine.</strong> The playground's float32 JavaScript implementation of the published weights (Hugging Face revisions <code>{E(RES['models']['pretrained']['revision'][:8])}</code> and <code>{E(RES['models']['sft']['revision'][:8])}</code>), not PyTorch. Uncertainty: 2,000-sample bootstrap over items.</li>
-          <li><strong>Not a clinical evaluation.</strong> These numbers measure language modelling on held-out text. They say nothing about medical safety or correctness.</li>
+          <li><strong>Not a clinical evaluation.</strong> These numbers measure language modeling on held-out text. They say nothing about medical safety or correctness.</li>
         </ul>
       </details>
-      <div class="me-links"><a href="https://su394611-del.github.io/research/medsparse-healthcare-2026/">Technical report (PDF)</a><a href="https://doi.org/10.5281/zenodo.24461541" target="_blank" rel="noopener noreferrer">DOI · 10.5281/zenodo.24461541 ↗</a><a href="eval/results.json">results.json</a><a href="https://github.com/su394611-del/MedSparse-Healthcare-LLM-From-Scratch/tree/main/eval" target="_blank" rel="noopener noreferrer">Evaluation code ↗</a><a href="#try-live">Try the models</a></div>
+      <div class="me-links"><a href="https://su394611-del.github.io/research/medsparse-healthcare-2026/">Technical report</a><a href="https://doi.org/10.5281/zenodo.24461541" target="_blank" rel="noopener noreferrer">DOI · 10.5281/zenodo.24461541 ↗</a><a href="eval/results.json">results.json</a><a href="https://github.com/su394611-del/MedSparse-Healthcare-LLM-From-Scratch/tree/main/eval" target="_blank" rel="noopener noreferrer">Evaluation code ↗</a><a href="#try-live">Try the models</a></div>
     </section>
     <!-- model-eval:end -->"""
 
