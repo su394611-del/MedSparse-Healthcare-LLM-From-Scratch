@@ -7,7 +7,7 @@
 ## Run MedSparse
 
 - **Use a released 38.8M checkpoint.** Download the complete pretrained or medical SFT bundle. The native loader needs the matching `model.safetensors`, `config.json`, and `tokenizer.json` from that bundle.
-- **Inspect the released architecture.** Run `python -m scripts.inspect_model --config configs/healthcare_moe_gpu_4gb.json`. The inspector reports 38,779,008 parameters.
+- **Inspect the released architecture.** Run `python -m scripts.inspect_model --config configs/healthcare_moe_single.json`. The inspector reports 38,779,008 parameters.
 - **Exercise both training stages on a CPU.** Run `python -m scripts.two_stage_smoke --pretrain-steps 1 --sft-steps 1` with the bundled synthetic fixtures.
 
 See [the run guide](RUN_MEDSPARSE.md) for setup and required files. The 1.08B training commands below use a separate architecture preset.
