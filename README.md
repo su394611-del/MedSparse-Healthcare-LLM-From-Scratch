@@ -10,7 +10,7 @@
 - **Inspect the released architecture.** Run `python -m scripts.inspect_model --config configs/healthcare_moe_single.json`. The inspector reports 38,779,008 parameters.
 - **Exercise both training stages on a CPU.** Run `python -m scripts.two_stage_smoke --pretrain-steps 1 --sft-steps 1` with the bundled synthetic fixtures.
 
-See [the run guide](RUN_MEDSPARSE.md) for setup and required files. The 1.08B training commands below use a separate architecture preset.
+See [the run guide](RUN_MEDSPARSE.md) for setup and required files, or open [Getting Started](https://github.com/su394611-del/MedSparse-Healthcare-LLM-From-Scratch/wiki/Getting-Started) and [Repository Map](https://github.com/su394611-del/MedSparse-Healthcare-LLM-From-Scratch/wiki/Repository-Map) in the wiki. The 1.08B training commands below use a separate architecture preset.
 
 This repository extends the original PyTorch **native, randomly initialized sparse-MoE architecture (Mixtral-inspired)**. Its intended sequence is:
 
