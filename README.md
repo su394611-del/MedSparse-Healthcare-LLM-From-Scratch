@@ -4,6 +4,14 @@
 
 **Released work:** the 38.8M-parameter [pretrained](https://huggingface.co/sudhanshu42844/medsparse-healthcare-pretrained-from-scratch) and [medical SFT](https://huggingface.co/sudhanshu42844/medsparse-healthcare-medical-sft) checkpoints on Hugging Face, the [technical report](https://su394611-del.github.io/research/medsparse-healthcare-2026/) (DOI [10.5281/zenodo.24461542](https://doi.org/10.5281/zenodo.24461542)), the [project site](https://su394611-del.github.io/MedSparse-Healthcare-LLM-From-Scratch/) with an in-browser playground, and the [engineering wiki](https://github.com/su394611-del/MedSparse-Healthcare-LLM-From-Scratch/wiki). Held-out results are in [`eval/results.json`](eval/results.json).
 
+## Run MedSparse
+
+- **Use a released 38.8M checkpoint.** Download the complete pretrained or medical SFT bundle. The native loader needs the matching `model.safetensors`, `config.json`, and `tokenizer.json` from that bundle.
+- **Inspect the released architecture.** Run `python -m scripts.inspect_model --config configs/healthcare_moe_single.json`. The inspector reports 38,779,008 parameters.
+- **Exercise both training stages on a CPU.** Run `python -m scripts.two_stage_smoke --pretrain-steps 1 --sft-steps 1` with the bundled synthetic fixtures.
+
+See [the run guide](RUN_MEDSPARSE.md) for setup and required files. The 1.08B training commands below use a separate architecture preset.
+
 This repository extends the original PyTorch **native, randomly initialized sparse-MoE architecture (Mixtral-inspired)**. Its intended sequence is:
 
 1. **Build a tokenizer only on biomedical / healthcare publications from Hugging Face.**
