@@ -134,21 +134,46 @@
     const isOpen = nav?.classList.toggle('is-open');
     document.querySelector('.menu-button')?.setAttribute('aria-expanded', String(Boolean(isOpen)));
   });
-  function markTab(key) {
-    document.querySelectorAll('[data-diagram]').forEach(b => {
-      const selected = b.dataset.diagram === key;
-      b.classList.toggle('active', selected);
-      b.setAttribute('aria-selected', String(selected));
+  const tabs = Array.from(document.querySelectorAll('[data-diagram]'));
+  const panel = document.getElementById('diagram-render');
+
+  function setTabStop(target) {
+    tabs.forEach(tab => {
+      tab.tabIndex = tab === target ? 0 : -1;
     });
   }
-  for (const button of document.querySelectorAll('[data-diagram]')) {
-    button.addEventListener('click', () => {
-      markTab(button.dataset.diagram);
-      displayDiagram(button.dataset.diagram);
+
+  function markTab(target) {
+    setTabStop(target);
+    for (const tab of tabs) {
+      const selected = tab === target;
+      tab.classList.toggle('active', selected);
+      tab.setAttribute('aria-selected', String(selected));
+    }
+    panel?.setAttribute('aria-labelledby', target.id);
+  }
+
+  for (const [index, tab] of tabs.entries()) {
+    tab.addEventListener('click', () => {
+      markTab(tab);
+      displayDiagram(tab.dataset.diagram);
+    });
+    tab.addEventListener('keydown', event => {
+      const offsets = { ArrowLeft: -1, ArrowRight: 1 };
+      let next;
+      if (event.key === 'Home') next = tabs[0];
+      else if (event.key === 'End') next = tabs[tabs.length - 1];
+      else if (Object.hasOwn(offsets, event.key)) {
+        next = tabs[(index + offsets[event.key] + tabs.length) % tabs.length];
+      }
+      if (!next) return;
+      event.preventDefault();
+      setTabStop(next);
+      next.focus();
     });
   }
-  // Vue used to highlight the initial tab; mark it here so the selected diagram is visible on load.
-  markTab(activeKey);
+  const initialTab = tabs.find(tab => tab.dataset.diagram === activeKey);
+  if (initialTab) markTab(initialTab);
   document.getElementById('copy-diagram-button')?.addEventListener('click', copySource);
   displayDiagram(activeKey);
 })();
