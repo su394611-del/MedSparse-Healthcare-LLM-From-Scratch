@@ -271,14 +271,29 @@ The authors declare that the study of the study, the study is a role of the manu
     </section>
     <!-- model-eval:end -->
     <section class="section container" id="miriad-results" aria-labelledby="miriad-results-title" v-pre>
-      <div class="section-intro"><div><p class="kicker">04 / MODEL EVALUATION · RELEASE 03</p><h2 id="miriad-results-title">MIRIAD fine-tune, <span class="gradient-text">checked on held-out papers.</span></h2></div><p>15 MIRIAD questions from 15 different papers that were held out of training, answered by the released checkpoint and by the Medical SFT release it started from. Evaluated 2026-11-25.</p></div>
+      <div class="section-intro"><div><p class="kicker">04 / MODEL EVALUATION · RELEASE 03</p><h2 id="miriad-results-title">MIRIAD fine-tune, <span class="gradient-text">benchmarked on held-out data.</span></h2></div><p>All three releases scored on exactly the same held-out items, with the same browser engine as the 20 Nov results above, plus 15 MIRIAD questions from papers excluded from training. Evaluated 2026-11-25.</p></div>
       <div class="me-stats">
-        <div class="me-stat"><span class="me-label">Perplexity on MIRIAD answers</span><b class="me-good">9.5 <small>after MIRIAD</small></b><p>383 before MIRIAD (the Medical SFT release). Reference answers only.</p></div>
-        <div class="me-stat"><span class="me-label">Word-overlap F1</span><b>0.35 <small>after</small></b><p>0.19 before. A rough lexical score, not a measure of correctness.</p></div>
-        <div class="me-stat"><span class="me-label">Answers judged correct</span><b>3 <small>of 15</small></b><p>Correct or mostly correct in an informal read-through. 5 were vague or incomplete, 7 were wrong.</p></div>
-        <div class="me-stat"><span class="me-label">Best validation loss</span><b>2.19 <small>CE</small></b><p>Completion-only cross-entropy on 64 held-out examples, at the released checkpoint.</p></div>
+        <div class="me-stat"><span class="me-label">Medical Q&amp;A perplexity</span><b class="me-good">59.6 <small>MIRIAD SFT</small></b><p>253 for Medical SFT · 76% lower (paired 95% CI 71–81%). Same 80 held-out medical-o1 answers.</p></div>
+        <div class="me-stat"><span class="me-label">PubMed perplexity</span><b>586 <small>MIRIAD SFT</small></b><p>667 Medical SFT · 572 Pretrained. The difference from Medical SFT is within noise (paired CI of the ratio 0.71–1.08).</p></div>
+        <div class="me-stat"><span class="me-label">MedMCQA accuracy</span><b>31% <small>MIRIAD SFT</small></b><p>29% Medical SFT · 33% Pretrained · 25% chance · 38% for always answering “A”. Still close to guessing.</p></div>
+        <div class="me-stat"><span class="me-label">MIRIAD held-out perplexity</span><b class="me-good">9.5 <small>MIRIAD SFT</small></b><p>383 for Medical SFT, on 15 questions from held-out MIRIAD papers. 3 of 15 answers judged correct or mostly correct.</p></div>
       </div>
       <div class="me-table-wrap">
+        <table class="me-table me-table-3">
+          <caption>Lower perplexity is better. Brackets show 95% bootstrap intervals (perplexity) or Wilson intervals (accuracy) over evaluation items. Uniform guessing over the 30,001-token vocabulary scores a perplexity of 30,001.</caption>
+          <thead><tr><th scope="col">Benchmark</th><th scope="col">Pretrained</th><th scope="col">Medical SFT</th><th scope="col">MIRIAD SFT</th></tr></thead>
+          <tbody>
+            <tr><td>Medical Q&amp;A held-out perplexity (80 answers, 7,943 tokens)</td><td><b>692</b><span class="me-ci">643–741</span></td><td><b>253</b><span class="me-ci">233–273</span></td><td><b>59.6</b><span class="me-ci">48.6–72.8</span></td></tr>
+            <tr><td>PubMed held-out perplexity (40 articles, 5,120 tokens)</td><td><b>572</b><span class="me-ci">473–704</span></td><td><b>667</b><span class="me-ci">546–823</span></td><td><b>586</b><span class="me-ci">446–789</span></td></tr>
+            <tr><td>Next-token top-1 accuracy, Q&amp;A</td><td><b>14.4%</b></td><td><b>21.6%</b></td><td><b>33.8%</b></td></tr>
+            <tr><td>Next-token top-1 accuracy, PubMed</td><td><b>15.6%</b></td><td><b>14.3%</b></td><td><b>16.8%</b></td></tr>
+            <tr><td>MedMCQA accuracy (150 questions; chance 25%, majority answer 38%)</td><td><b>32.7%</b><span class="me-ci">25.7%–40.5%</span></td><td><b>28.7%</b><span class="me-ci">22.0%–36.4%</span></td><td><b>31.3%</b><span class="me-ci">24.5%–39.1%</span></td></tr>
+            <tr><td>MIRIAD held-out answer perplexity (15 questions, PyTorch)</td><td>—</td><td><b>383</b></td><td><b>9.5</b></td></tr>
+            <tr><td>MIRIAD word-overlap F1 with reference answers</td><td>—</td><td><b>0.19</b></td><td><b>0.35</b></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="me-table-wrap me-spaced">
         <table class="me-table me-table-kv">
           <caption>Training run behind Release 03, from the checkpoint&#x27;s own training state.</caption>
           <thead><tr><th scope="col">Setting</th><th scope="col">Value</th></tr></thead>
@@ -286,6 +301,7 @@ The authors declare that the study of the study, the study is a role of the manu
             <tr><td>Data</td><td>MIRIAD 5.8M (question → answer), 5,821,948 pairs</td></tr>
             <tr><td>Held-out split</td><td>2% of papers (seed 42); every Q&amp;A from a held-out paper is excluded</td></tr>
             <tr><td>Optimizer steps / examples processed</td><td><b>1,507,000</b> steps · about 6.03M examples (batch 1 × gradient accumulation 4)</td></tr>
+            <tr><td>Best validation loss</td><td>2.19 completion-only cross-entropy on 64 held-out examples</td></tr>
             <tr><td>Sequence length</td><td>192 tokens · 6.6% of training answers (398,337) were truncated to fit</td></tr>
             <tr><td>Optimizer and hardware</td><td>AdamW, lr 2e-5, FP32, on a single consumer-grade GPU</td></tr>
           </tbody>
@@ -302,15 +318,15 @@ The authors declare that the study of the study, the study is a role of the manu
       <details class="me-method">
         <summary>How this was measured, and the limits</summary>
         <ul>
-          <li><strong>Held-out data.</strong> The training script&#x27;s own paper-level split (seed 42, 2%), one question per held-out paper, spread across the 64 MIRIAD shards.</li>
-          <li><strong>Scoring.</strong> PyTorch on CPU with the project&#x27;s native engine and training prompt format. Perplexity is on MIRIAD&#x27;s reference answers (192-token window). Greedy decoding, repetition penalty 1.2, up to 120 new tokens. These numbers use a different dataset, window and engine from the 20 Nov table above, so they are not directly comparable with it.</li>
-          <li><strong>Correctness.</strong> The read-through is informal and not an expert clinical review. Common errors: wrong facts stated confidently, word-sense confusions and a repeated word in place of a list.</li>
-          <li><strong>Data coverage.</strong> Training resumed several times with a shuffled streaming reader, and the resume skip did not line up with the shuffled stream: the row counter overshot MIRIAD by 328,159 rows. Some pairs were trained more than once and full coverage is not verified. The held-out filter was applied to every row, so no held-out paper entered training.</li>
-          <li><strong>Small sample.</strong> 15 questions is a development check, not a benchmark. Larger held-out and standard-benchmark results (for example MedQA or PubMedQA) are next.</li>
-          <li><strong>Not a clinical evaluation.</strong> Never use this model for diagnosis, treatment or any decision about a real person.</li>
+          <li><strong>What it means.</strong> MIRIAD training made the model far better at predicting held-out medical answers (Q&amp;A perplexity 253 → 59.6) without hurting PubMed text, which it slightly improved. Multiple-choice accuracy did not move meaningfully: at 38.8M parameters, recognising the right option is still close to guessing.</li>
+          <li><strong>Same items, same engine.</strong> PubMed, Q&amp;A and MedMCQA use the identical held-out row indices and the playground&#x27;s float32 JavaScript engine from the 20 Nov run. As a check, Medical SFT was re-scored in the same run and reproduced its published numbers exactly (252.86 and 667.04). Model revisions: MIRIAD SFT <code>b65a4702</code>, Medical SFT <code>7222352b</code>. Harness: <code>eval/browser/driver_miriad.js</code>, <code>aggregate_miriad.js</code>.</li>
+          <li><strong>MIRIAD questions.</strong> 15 questions from the training script&#x27;s own paper-level held-out split (seed 42, 2%), one per paper, scored in PyTorch on CPU with a 192-token window. The correctness read-through is informal, not an expert clinical review.</li>
+          <li><strong>Data coverage.</strong> Training resumed several times with a shuffled streaming reader, and the resume skip did not line up with the shuffled stream: the row counter overshot MIRIAD by 328,159 rows. Some pairs were trained more than once and full coverage is not verified. The held-out filter was applied to every row.</li>
+          <li><strong>Not measured.</strong> Coding benchmarks such as HumanEval do not apply to a medical language model. Standard medical QA suites (MedQA, PubMedQA) and a larger MIRIAD held-out set are next.</li>
+          <li><strong>Not a clinical evaluation.</strong> Never use these models for diagnosis, treatment or any decision about a real person.</li>
         </ul>
       </details>
-      <div class="me-links"><a href="https://huggingface.co/sudhanshu42844/medsparse-healthcare-miriad-sft" target="_blank" rel="noopener noreferrer">Model card and weights ↗</a><a href="/playground/?model=miriad">Try it in the playground ↗</a></div>
+      <div class="me-links"><a href="https://huggingface.co/sudhanshu42844/medsparse-healthcare-miriad-sft" target="_blank" rel="noopener noreferrer">Model card and weights ↗</a><a href="eval/results_miriad.json">results_miriad.json</a><a href="https://huggingface.co/datasets/miriad/miriad-5.8M" target="_blank" rel="noopener noreferrer">MIRIAD dataset ↗</a><a href="/playground/?model=miriad">Try it in the playground ↗</a></div>
     </section>
 
     <section class="section section-banded" id="architecture" aria-labelledby="architecture-title"><div class="container">

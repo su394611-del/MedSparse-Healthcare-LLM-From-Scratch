@@ -22,6 +22,27 @@ Tiny GPT ([my-tiny-llm](https://huggingface.co/sudhanshu42844/my-tiny-llm)): Tin
 Brackets are 95% intervals (bootstrap over items for perplexity, Wilson for accuracy). Full numbers, row indices and sample generations: [`results.json`](results.json).
 <!-- results:end -->
 
+## Release 03: MIRIAD SFT (2026-11-25)
+
+[MIRIAD SFT](https://huggingface.co/sudhanshu42844/medsparse-healthcare-miriad-sft) (revision `b65a4702`) on the same
+held-out items, scored by the same engine. Medical SFT was re-scored in the same run as a check and reproduced its
+published numbers exactly (252.86 and 667.04).
+
+| Metric | Pretrained | Medical SFT | MIRIAD SFT |
+|---|---|---|---|
+| Medical Q&A held-out perplexity (80 answers) | 692 (643–741) | 253 (233–273) | **59.6 (48.6–72.8)** |
+| PubMed held-out perplexity (40 articles) | 572 (473–704) | 667 (546–823) | 586 (446–789) |
+| Next-token top-1 accuracy, PubMed / Q&A | 15.6% / 14.4% | 14.3% / 21.6% | 16.8% / 33.8% |
+| MedMCQA accuracy (150 questions, chance 25%) | 32.7% (25.7%–40.5%) | 28.7% (22.0%–36.4%) | 31.3% (24.5%–39.1%) |
+
+Paired MIRIAD-vs-Medical-SFT perplexity ratio: Q&A 0.236 (0.194–0.287), PubMed 0.878 (0.71–1.08).
+
+Also on 15 questions from MIRIAD papers held out of training (PyTorch, 192-token window): reference-answer
+perplexity 9.5 vs 383 for Medical SFT; word-overlap F1 0.35 vs 0.19; an informal read-through judged 3 answers
+correct or mostly correct, 5 vague and 7 wrong. Full numbers: [`results_miriad.json`](results_miriad.json).
+Harness: `browser/driver_miriad.js` and `browser/aggregate_miriad.js`.
+
+
 ## What is measured
 
 | Test | Data | How it is scored |
@@ -50,7 +71,9 @@ and was checked against Python's `hashlib` on 308 strings, Unicode edge cases in
 
 ## Re-run it
 
-1. Open https://su394611-del.github.io/playground/ in a desktop browser (the evaluation downloads both 155 MB checkpoints).
+1. Open https://su394611-del.github.io/playground/worker-src.js in a desktop browser. The playground page itself now has a
+   Content-Security-Policy that blocks `new Function` and blob workers; this plain-text file is on the same origin and
+   has none. The evaluation downloads the 155 MB checkpoints.
 2. Open the developer console and run:
 
 ```js
@@ -60,6 +83,8 @@ window.Split = new Function((await src('split.js')) + '\nreturn Split;')();
 window.aggregateEval = new Function((await src('aggregate.js')) + '\nreturn aggregateEval;')();
 window.__EV_WORKER_SRC = await src('worker.js');
 new Function(await src('driver.js'))();
+// Release 03 instead: window.aggregateMiriad = new Function((await src('aggregate_miriad.js')) + '\nreturn aggregateMiriad;')();
+//                    new Function(await src('driver_miriad.js'))();  then aggregateMiriad(window.__EVAL)
 // poll window.__EVAL.progress; when window.__EVAL.status === 'done':
 // copy(JSON.stringify(aggregateEval(window.__EVAL), null, 2))
 ```
