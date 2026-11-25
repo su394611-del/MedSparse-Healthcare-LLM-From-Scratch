@@ -134,7 +134,7 @@ medsparse-playground</code></pre>
 
     <!-- model-eval:start -->
     <section class="section container" id="evaluation" aria-labelledby="evaluation-title" v-pre>
-      <div class="section-intro"><div><p class="kicker">04 / MODEL EVALUATION</p><h2 id="evaluation-title">Held-out results, <span class="gradient-text">measured in the browser.</span></h2></div><p>Both checkpoints scored on data they never trained on, picked with the same hash-based splits the training code uses, and run on the same JavaScript engine as the playground above. Evaluated 2026-11-20.</p></div>
+      <div class="section-intro"><div><p class="kicker">04 / MODEL EVALUATION</p><h2 id="evaluation-title">November 20 <span class="gradient-text">baseline results.</span></h2></div><p>The pretrained and Medical SFT checkpoints were scored in the browser on held-out data selected using the training code’s hash-based splits. Evaluated 2026-11-20. <a href="#miriad-results">Compare all three MedSparse checkpoints in the November 25 update.</a></p></div>
       <div class="me-stats">
         <div class="me-stat"><span class="me-label">Medical Q&amp;A perplexity</span><b class="me-good">253 <small>after SFT</small></b><p>692 before SFT · 64% lower. 80 held-out medical-o1 answers.</p></div>
         <div class="me-stat"><span class="me-label">PubMed perplexity</span><b>572 <small>pretrained</small></b><p>667 after SFT. 40 held-out PubMed Central articles.</p></div>
@@ -157,7 +157,7 @@ medsparse-playground</code></pre>
       </div>
       <article class="me-train" aria-labelledby="training-progress-title">
         <h3 id="training-progress-title">Training progress</h3>
-        <p>Held-out loss at each published checkpoint, from an untrained model (step 0) through 5,000 pretraining steps and 2,000 medical SFT steps. Dots are measurements with their 95% intervals; dashed lines only connect them.</p>
+        <p>Held-out loss across the first two training stages, from an untrained model (step 0) through 5,000 pretraining steps and 2,000 medical SFT steps. Dots are measurements with their 95% intervals; dashed lines only connect them.</p>
         <div class="me-train-grid">
           <div class="me-chart-wrap"><div class="me-legend"><span><i data-chart-style="background-1ca3b0"></i>PubMed held-out (40 articles)</span><span><i data-chart-style="background-8c78ee"></i>Medical Q&amp;A held-out (80 answers)</span></div><svg class="me-chart" viewBox="0 0 480 320" role="img" aria-labelledby="tc-title tc-desc" xmlns="http://www.w3.org/2000/svg">
 <title id="tc-title">Held-out loss at each training stage</title>
@@ -270,16 +270,16 @@ The authors declare that the study of the study, the study is a role of the manu
     </section>
     <!-- model-eval:end -->
     <section class="section container" id="miriad-results" aria-labelledby="miriad-results-title" v-pre>
-      <div class="section-intro"><div><p class="kicker">04 / MODEL EVALUATION · RELEASE 03</p><h2 id="miriad-results-title">MIRIAD fine-tune, <span class="gradient-text">benchmarked on held-out data.</span></h2></div><p>All three releases were scored on the same shared benchmarks using the browser engine. A separate PyTorch check compared Medical SFT and MIRIAD SFT on 15 questions from held-out MIRIAD papers. Evaluated 2026-11-25.</p></div>
+      <div class="section-intro"><div><p class="kicker">04 / MODEL EVALUATION · RELEASE 03</p><h2 id="miriad-results-title">November 25 update: <span class="gradient-text">three MedSparse checkpoints.</span></h2></div><p>The browser comparison uses the same held-out items as the <a href="#evaluation">November 20 baseline</a>. Medical SFT reproduced its original perplexity scores when rerun. A separate PyTorch check compared Medical SFT and MIRIAD SFT on 15 questions from held-out MIRIAD papers.</p></div>
       <div class="me-stats">
         <div class="me-stat"><span class="me-label">Medical Q&amp;A perplexity</span><b class="me-good">59.6 <small>MIRIAD SFT</small></b><p>253 for Medical SFT · 76% lower (paired 95% CI 71–81%). Same 80 held-out medical-o1 answers.</p></div>
-        <div class="me-stat"><span class="me-label">PubMed perplexity</span><b>586 <small>MIRIAD SFT</small></b><p>667 Medical SFT · 572 Pretrained. The difference from Medical SFT is within noise (paired CI of the ratio 0.71–1.08).</p></div>
+        <div class="me-stat"><span class="me-label">PubMed perplexity</span><b>586 <small>MIRIAD SFT</small></b><p>667 Medical SFT · 572 Pretrained. The paired 95% interval for the perplexity ratio versus Medical SFT was 0.71–1.08.</p></div>
         <div class="me-stat"><span class="me-label">MedMCQA accuracy</span><b>31% <small>MIRIAD SFT</small></b><p>29% Medical SFT · 33% Pretrained · 25% chance · 38% for always answering “A”. Still close to guessing.</p></div>
         <div class="me-stat"><span class="me-label">MIRIAD held-out perplexity</span><b class="me-good">9.5 <small>MIRIAD SFT</small></b><p>383 for Medical SFT, on 15 questions from held-out MIRIAD papers. 3 of 15 answers judged correct or mostly correct.</p></div>
       </div>
       <div class="me-table-wrap">
         <table class="me-table me-table-3">
-          <caption>Lower perplexity is better. Brackets show 95% bootstrap intervals (perplexity) or Wilson intervals (accuracy) over evaluation items. Uniform guessing over the 30,001-token vocabulary scores a perplexity of 30,001.</caption>
+          <caption>Shared browser benchmarks. Lower perplexity is better. The ranges show 95% bootstrap intervals (perplexity) or Wilson intervals (accuracy) over evaluation items. Uniform guessing over the 30,001-token vocabulary scores a perplexity of 30,001.</caption>
           <thead><tr><th scope="col">Benchmark</th><th scope="col">Pretrained</th><th scope="col">Medical SFT</th><th scope="col">MIRIAD SFT</th></tr></thead>
           <tbody>
             <tr><td>Medical Q&amp;A held-out perplexity (80 answers, 7,943 tokens)</td><td><b>692</b><span class="me-ci">643–741</span></td><td><b>253</b><span class="me-ci">233–273</span></td><td><b>59.6</b><span class="me-ci">48.6–72.8</span></td></tr>
@@ -287,8 +287,16 @@ The authors declare that the study of the study, the study is a role of the manu
             <tr><td>Next-token top-1 accuracy, Q&amp;A</td><td><b>14.4%</b></td><td><b>21.6%</b></td><td><b>33.8%</b></td></tr>
             <tr><td>Next-token top-1 accuracy, PubMed</td><td><b>15.6%</b></td><td><b>14.3%</b></td><td><b>16.8%</b></td></tr>
             <tr><td>MedMCQA accuracy (150 questions; chance 25%, majority answer 38%)</td><td><b>32.7%</b><span class="me-ci">25.7%–40.5%</span></td><td><b>28.7%</b><span class="me-ci">22.0%–36.4%</span></td><td><b>31.3%</b><span class="me-ci">24.5%–39.1%</span></td></tr>
-            <tr><td>MIRIAD held-out answer perplexity (15 questions, PyTorch)</td><td>—</td><td><b>383</b></td><td><b>9.5</b></td></tr>
-            <tr><td>MIRIAD word-overlap F1 with reference answers</td><td>—</td><td><b>0.19</b></td><td><b>0.35</b></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="me-table-wrap me-spaced">
+        <table class="me-table me-table-kv">
+          <caption>Separate PyTorch check on 15 questions from held-out MIRIAD papers.</caption>
+          <thead><tr><th scope="col">Metric</th><th scope="col">Medical SFT</th><th scope="col">MIRIAD SFT</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">Reference-answer perplexity</th><td>383</td><td>9.5</td></tr>
+            <tr><th scope="row">Word-overlap F1 with reference answers</th><td>0.19</td><td>0.35</td></tr>
           </tbody>
         </table>
       </div>
