@@ -2,11 +2,11 @@
 
 *MedSparse Healthcare (formerly Mixtral Healthcare) is a custom sparse Mixture-of-Experts language model with a Mixtral-inspired architecture. It does not use or distribute official Mistral AI or Mixtral weights.*
 
-**Released work:** the 38.8M-parameter [pretrained](https://huggingface.co/sudhanshu42844/medsparse-healthcare-pretrained-from-scratch) and [medical SFT](https://huggingface.co/sudhanshu42844/medsparse-healthcare-medical-sft) checkpoints on Hugging Face, the [technical report](https://su394611-del.github.io/research/medsparse-healthcare-2026/) (DOI [10.5281/zenodo.24461541](https://doi.org/10.5281/zenodo.24461541)), the [project site](https://su394611-del.github.io/MedSparse-Healthcare-LLM-From-Scratch/) with an in-browser playground, and the [engineering wiki](https://github.com/su394611-del/MedSparse-Healthcare-LLM-From-Scratch/wiki). Held-out results are in [`eval/results.json`](eval/results.json).
+**Released work:** the 38.8M-parameter [pretrained](https://huggingface.co/sudhanshu42844/medsparse-healthcare-pretrained-from-scratch), [medical SFT](https://huggingface.co/sudhanshu42844/medsparse-healthcare-medical-sft), and [MIRIAD SFT](https://huggingface.co/sudhanshu42844/medsparse-healthcare-miriad-sft) checkpoints on Hugging Face, the [technical report](https://su394611-del.github.io/research/medsparse-healthcare-2026/) (DOI [10.5281/zenodo.24461541](https://doi.org/10.5281/zenodo.24461541)), the [project site](https://su394611-del.github.io/MedSparse-Healthcare-LLM-From-Scratch/) with an in-browser playground, and the [engineering wiki](https://github.com/su394611-del/MedSparse-Healthcare-LLM-From-Scratch/wiki). Held-out results are in [`eval/results.json`](eval/results.json) and [`eval/results_miriad.json`](eval/results_miriad.json).
 
 ## Run MedSparse
 
-- **Use a released 38.8M checkpoint.** Download the complete pretrained or medical SFT bundle. The native loader needs the matching `model.safetensors`, `config.json`, and `tokenizer.json` from that bundle.
+- **Use a released 38.8M checkpoint.** Download the complete pretrained, medical SFT, or MIRIAD SFT bundle and follow its model card. The native loader needs the matching `model.safetensors`, `config.json`, and `tokenizer.json` from that bundle.
 - **Inspect the released architecture.** Run `python -m scripts.inspect_model --config configs/healthcare_moe_single.json`. The inspector reports 38,779,008 parameters.
 - **Exercise both training stages on a CPU.** Run `python -m scripts.two_stage_smoke --pretrain-steps 1 --sft-steps 1` with the bundled synthetic fixtures.
 
@@ -17,7 +17,8 @@ This repository extends the original PyTorch **native, randomly initialized spar
 1. **Build a tokenizer only on biomedical / healthcare publications from Hugging Face.**
 2. **Stage 1 — pretrain every model weight from RANDOM INITIALIZATION** on an auditable healthcare text corpus with standard next-token loss and auxiliary MoE load-balancing loss. **No Mistral/Mixtral pretrained weights are downloaded or used.**
 3. **Stage 2 — use the Stage 1 native checkpoint as initialization and fully fine-tune the same model** on separate medical instruction/QA data from Hugging Face. All weights remain trainable; a *new* optimizer is initialized.
-4. Evaluate on held-out data and with medical experts before considering any clinical use.
+4. **Stage 3 — continue full-parameter SFT from the Stage 2 checkpoint** using MIRIAD research Q&A and a paper-level validation split.
+5. Evaluate on held-out data.
 
 The **code is NOT a pretrained billion-parameter healthcare model**. The CPU-only smoke test proves the pipeline, not medical competence. Running 1B/46.7B training, especially at large contexts, requires substantial CUDA GPU resources.
 
@@ -118,7 +119,11 @@ Alternative medical SFT dataset:
 
 Review its upstream data lineage and patient privacy first. Do not publish automatically.
 
-### Stage 3 — evaluate
+### Stage 3 — MIRIAD SFT
+
+The [released MIRIAD checkpoint](https://huggingface.co/sudhanshu42844/medsparse-healthcare-miriad-sft) continues Stage 2 training. It was saved at 1,507,000 optimizer steps with 6,031,000 processed training examples, including repeats. A resume issue affected the shuffled stream, so unique row coverage is unverified. See Section 7 of the [technical report](https://su394611-del.github.io/research/medsparse-healthcare-2026/) for the coverage analysis.
+
+### Evaluation
 
 The pretraining script can calculate next-token validation cross-entropy / perplexity by setting `--eval-every`. Stage 2 calculates held-out answer-only validation loss and perplexity by setting `--eval-every` and `--eval-batches`. Both are **development metrics**, not medical accuracy or patient safety. Add expert-reviewed testing for medical questions, uncertainty, drug safety, patient triage, bias, PHI exposure, memorization and hallucinations prior to any real clinical use.
 
