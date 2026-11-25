@@ -1,10 +1,15 @@
 # Evaluation
 
-Held-out evaluation of the two published checkpoints
-([pretrained](https://huggingface.co/sudhanshu42844/medsparse-healthcare-pretrained-from-scratch),
-[medical SFT](https://huggingface.co/sudhanshu42844/medsparse-healthcare-medical-sft)) and the
-[Tiny GPT](https://huggingface.co/sudhanshu42844/my-tiny-llm), run in a web browser on the same JavaScript
-engine as the [Model Playground](https://su394611-del.github.io/playground/).
+The [November 20 baseline](#results-2026-11-20) evaluated the
+[pretrained](https://huggingface.co/sudhanshu42844/medsparse-healthcare-pretrained-from-scratch) and
+[Medical SFT](https://huggingface.co/sudhanshu42844/medsparse-healthcare-medical-sft) MedSparse checkpoints in the
+[Model Playground](https://su394611-del.github.io/playground/)'s JavaScript engine. It also evaluated
+[Tiny GPT](https://huggingface.co/sudhanshu42844/my-tiny-llm) separately on TinyStories.
+
+The [November 25 update](#miriad-sft-evaluation-2026-11-25) adds MIRIAD SFT to the same browser benchmarks.
+Medical Q&A perplexity fell from 253 to 59.6 versus Medical SFT (76% lower, paired 95% CI 71–81%).
+The PubMed difference was inconclusive, and MedMCQA accuracy was 31.3% against a 38% majority-answer baseline.
+In the separate 15-question PyTorch check, an informal review judged 3 MIRIAD SFT answers correct or mostly correct.
 
 <!-- results:start -->
 ## Results (2026-11-20)
@@ -22,7 +27,7 @@ Tiny GPT ([my-tiny-llm](https://huggingface.co/sudhanshu42844/my-tiny-llm)): Tin
 Brackets are 95% intervals (bootstrap over items for perplexity, Wilson for accuracy). Full numbers, row indices and sample generations: [`results.json`](results.json).
 <!-- results:end -->
 
-## Release 03: MIRIAD SFT (2026-11-25)
+## MIRIAD SFT evaluation (2026-11-25)
 
 [MIRIAD SFT](https://huggingface.co/sudhanshu42844/medsparse-healthcare-miriad-sft) (revision `b65a4702`) on the same
 held-out items, scored by the same engine. Medical SFT was re-scored in the same run as a check and reproduced its
@@ -33,7 +38,7 @@ published numbers exactly (252.86 and 667.04).
 | Medical Q&A held-out perplexity (80 answers) | 692 (643–741) | 253 (233–273) | **59.6 (48.6–72.8)** |
 | PubMed held-out perplexity (40 articles) | 572 (473–704) | 667 (546–823) | 586 (446–789) |
 | Next-token top-1 accuracy, PubMed / Q&A | 15.6% / 14.4% | 14.3% / 21.6% | 16.8% / 33.8% |
-| MedMCQA accuracy (150 questions, chance 25%) | 32.7% (25.7%–40.5%) | 28.7% (22.0%–36.4%) | 31.3% (24.5%–39.1%) |
+| MedMCQA accuracy (150 questions, chance 25%, majority answer 38%) | 32.7% (25.7%–40.5%) | 28.7% (22.0%–36.4%) | 31.3% (24.5%–39.1%) |
 
 Paired MIRIAD-vs-Medical-SFT perplexity ratio: Q&A 0.236 (0.194–0.287), PubMed 0.878 (0.71–1.08).
 
@@ -94,7 +99,7 @@ the same model revisions; speeds depend on the machine.
 
 ## Training curve
 
-The project page's **Training progress** chart currently shows held-out loss at each published checkpoint
+The project page's **Training progress** chart currently shows held-out loss across the first two training stages
 (untrained, after 5,000 pretraining steps, after 2,000 SFT steps), because per-step loss from those runs was
 only printed to the console. The training scripts now also append every logged step to a JSON Lines file
 (`MetricsLog` in `mixtral_lab/train_utils.py`):
