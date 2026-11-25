@@ -191,7 +191,7 @@ mix_section = f"""<!-- model-eval:start -->
           <li><strong>Not a clinical evaluation.</strong> These numbers measure language modelling on held-out text. They say nothing about medical safety or correctness.</li>
         </ul>
       </details>
-      <div class="me-links"><a href="https://su394611-del.github.io/research/medsparse-healthcare-2026/">Technical report (PDF)</a><a href="https://doi.org/10.5281/zenodo.24461542" target="_blank" rel="noopener noreferrer">DOI · 10.5281/zenodo.24461542 ↗</a><a href="eval/results.json">results.json</a><a href="https://github.com/su394611-del/MedSparse-Healthcare-LLM-From-Scratch/tree/main/eval" target="_blank" rel="noopener noreferrer">Evaluation code ↗</a><a href="#try-live">Try the models</a></div>
+      <div class="me-links"><a href="https://su394611-del.github.io/research/medsparse-healthcare-2026/">Technical report (PDF)</a><a href="https://doi.org/10.5281/zenodo.24461541" target="_blank" rel="noopener noreferrer">DOI · 10.5281/zenodo.24461541 ↗</a><a href="eval/results.json">results.json</a><a href="https://github.com/su394611-del/MedSparse-Healthcare-LLM-From-Scratch/tree/main/eval" target="_blank" rel="noopener noreferrer">Evaluation code ↗</a><a href="#try-live">Try the models</a></div>
     </section>
     <!-- model-eval:end -->"""
 
