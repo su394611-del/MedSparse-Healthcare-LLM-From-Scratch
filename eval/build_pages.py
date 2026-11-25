@@ -115,11 +115,11 @@ stage_rows = (
 legend = (f'<div class="me-legend"><span><i style="background:{training_chart.PUBMED}"></i>PubMed held-out ({n["pubmed"]["selected"]:d} articles)</span>'
           f'<span><i style="background:{training_chart.QA}"></i>Medical Q&amp;A held-out ({n["qa"]["selected"]:d} answers)</span></div>')
 if step_svg:
-    train_intro = 'Training and validation loss logged at every step of both stages, with held-out loss at each published checkpoint below.'
+    train_intro = 'Training and validation loss logged at every step of both stages, with held-out loss across the first two training stages below.'
     train_charts = step_svg + legend + training_chart.stage_chart(RES)
     train_note = ''
 else:
-    train_intro = ('Held-out loss at each published checkpoint, from an untrained model (step 0) through 5,000 pretraining steps and '
+    train_intro = ('Held-out loss across the first two training stages, from an untrained model (step 0) through 5,000 pretraining steps and '
                    '2,000 medical SFT steps. Dots are measurements with their 95% intervals; dashed lines only connect them.')
     train_charts = legend + training_chart.stage_chart(RES)
     train_note = ('<p class="me-train-note">Per-step loss was printed to the console during these two runs and not saved (the run folders keep only the final checkpoint and a manifest), so there is no step-by-step '
@@ -140,7 +140,7 @@ train_card = f"""<article class="me-train" aria-labelledby="training-progress-ti
 
 mix_section = f"""<!-- model-eval:start -->
     <section class="section container" id="evaluation" aria-labelledby="evaluation-title" v-pre>
-      <div class="section-intro"><div><p class="kicker">04 / MODEL EVALUATION</p><h2 id="evaluation-title">Held-out results, <span class="gradient-text">measured in the browser.</span></h2></div><p>Both checkpoints scored on data they never trained on, picked with the same hash-based splits the training code uses, and run on the same JavaScript engine as the playground above. Evaluated {date}.</p></div>
+      <div class="section-intro"><div><p class="kicker">04 / MODEL EVALUATION</p><h2 id="evaluation-title">November 20 <span class="gradient-text">baseline results.</span></h2></div><p>The pretrained and Medical SFT checkpoints were scored in the browser on held-out data selected using the training code’s hash-based splits. Evaluated {date}. <a href="#miriad-results">Compare all three MedSparse checkpoints in the November 25 update.</a></p></div>
       <div class="me-stats">
         <div class="me-stat"><span class="me-label">Medical Q&amp;A perplexity</span><b class="{'me-good' if qa_sig and qa_change > 0 else ''}">{ppl(SFT['medicalQaHeldOut']['perplexity'])} <small>after SFT</small></b><p>{ppl(PRE['medicalQaHeldOut']['perplexity'])} before SFT{f" · {pc(qa_change, 0)} lower" if qa_change > 0 else ""}. {n['qa']['selected']:d} held-out medical-o1 answers.</p></div>
         <div class="me-stat"><span class="me-label">PubMed perplexity</span><b>{ppl(PRE['pubmedHeldOut']['perplexity'])} <small>pretrained</small></b><p>{ppl(SFT['pubmedHeldOut']['perplexity'])} after SFT. {n['pubmed']['selected']:d} held-out PubMed Central articles.</p></div>
@@ -253,7 +253,7 @@ readme.write_text(rt, encoding='utf-8')
 # ------------------------------------------------------------------ AI Lab home page
 home_section = f"""<!-- model-eval:start -->
 <section aria-labelledby="model-eval-heading" class="layout model-eval" id="model-evaluation" v-pre>
-<div class="me-head"><div><p class="me-kicker">Model evaluation · {date}</p><h2 id="model-eval-heading">Three models, scored on held-out data.</h2></div><p>Measured in the browser with the same JavaScript engine as the <a href="/playground/" style="color:var(--cyan,#7be2f0)">Model Playground</a>, on text none of the models saw in training. Lower perplexity is better; it is not comparable across models with different tokenizers and data.</p></div>
+<div class="me-head"><div><p class="me-kicker">Model evaluation · {date}</p><h2 id="model-eval-heading">November 20 baseline results</h2></div><p>Measured in the browser with the same JavaScript engine as the <a href="/playground/" style="color:var(--cyan,#7be2f0)">Model Playground</a>, on text none of the models saw in training. Lower perplexity is better within the same benchmark and tokenizer. Tiny GPT was tested separately on TinyStories. <a href="#miriad-evaluation">Compare all three MedSparse checkpoints in the November 25 update.</a></p></div>
 <div class="me-cards">
 <article class="me-model"><div class="me-model-top"><span>MedSparse · Medical SFT</span><span>38.8M · MoE</span></div><h3>MedSparse Healthcare Medical SFT</h3><p class="me-size">Held-out medical Q&amp;A ({n['qa']['selected']:d} answers)</p><p class="me-big"><b>{ppl(SFT['medicalQaHeldOut']['perplexity'])}</b><span>perplexity</span></p>
 <ul><li>Before SFT<strong>{ppl(PRE['medicalQaHeldOut']['perplexity'])}{f' <span class="me-up">−{pc(qa_change, 0)}</span>' if qa_sig and qa_change > 0 else ''}</strong></li><li>MedMCQA accuracy<strong>{pc(sm['accuracy'], 0)} <span style="color:#8eacc8">(chance 25%)</span></strong></li><li>Browser speed<strong>{SFT['decodeTokensPerSec']:.0f} tokens/s</strong></li></ul></article>
