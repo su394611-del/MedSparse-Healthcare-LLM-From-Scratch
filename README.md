@@ -2,7 +2,7 @@
 
 *MedSparse Healthcare (formerly Mixtral Healthcare) is a custom sparse Mixture-of-Experts language model with a Mixtral-inspired architecture. It does not use or distribute official Mistral AI or Mixtral weights.*
 
-**Released work:** the 38.8M-parameter [pretrained](https://huggingface.co/sudhanshu42844/medsparse-healthcare-pretrained-from-scratch) and [medical SFT](https://huggingface.co/sudhanshu42844/medsparse-healthcare-medical-sft) checkpoints on Hugging Face, the [technical report](https://su394611-del.github.io/research/medsparse-healthcare-2026/) (DOI [10.5281/zenodo.24461542](https://doi.org/10.5281/zenodo.24461542)), the [project site](https://su394611-del.github.io/MedSparse-Healthcare-LLM-From-Scratch/) with an in-browser playground, and the [engineering wiki](https://github.com/su394611-del/MedSparse-Healthcare-LLM-From-Scratch/wiki). Held-out results are in [`eval/results.json`](eval/results.json).
+**Released work:** the 38.8M-parameter [pretrained](https://huggingface.co/sudhanshu42844/medsparse-healthcare-pretrained-from-scratch) and [medical SFT](https://huggingface.co/sudhanshu42844/medsparse-healthcare-medical-sft) checkpoints on Hugging Face, the [technical report](https://su394611-del.github.io/research/medsparse-healthcare-2026/) (DOI [10.5281/zenodo.24461541](https://doi.org/10.5281/zenodo.24461541)), the [project site](https://su394611-del.github.io/MedSparse-Healthcare-LLM-From-Scratch/) with an in-browser playground, and the [engineering wiki](https://github.com/su394611-del/MedSparse-Healthcare-LLM-From-Scratch/wiki). Held-out results are in [`eval/results.json`](eval/results.json).
 
 ## Run MedSparse
 
