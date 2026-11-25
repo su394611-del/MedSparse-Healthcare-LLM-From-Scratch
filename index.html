@@ -52,7 +52,7 @@
         <p class="eyebrow"><span class="signal" aria-hidden="true"></span> FROM FIRST PRINCIPLES <span class="eyebrow-year">/ 2026</span></p>
         <h1 id="hero-title">A healthcare LLM,<br><span class="gradient-text">built from scratch.</span></h1>
         <p class="hero-intro">An end-to-end PyTorch implementation of <strong>MedSparse Healthcare</strong>, a Mixtral-inspired sparse Mixture-of-Experts language model — from healthcare-specific tokenization and biomedical pretraining to full-parameter supervised medical fine-tuning.</p>
-        <p class="hero-support">Explore the design, trace how model weights move between training stages, inspect editable architecture diagrams, and access three releases on Hugging Face, the newest fine-tuned on 5.8M MIRIAD medical Q&amp;A pairs.</p>
+        <p class="hero-support">Explore the design, trace how model weights move between training stages, inspect editable architecture diagrams, and access three releases on Hugging Face, the newest fine-tuned using the MIRIAD 5.8M research Q&amp;A dataset.</p>
         <div class="hero-actions">
           <a class="button primary" href="#models">Explore the models <span aria-hidden="true">↗</span></a>
           <a class="button secondary" href="https://github.com/su394611-del/MedSparse-Healthcare-LLM-From-Scratch" target="_blank" rel="noopener noreferrer">Browse source code <span aria-hidden="true">↗</span></a>
@@ -271,7 +271,7 @@ The authors declare that the study of the study, the study is a role of the manu
     </section>
     <!-- model-eval:end -->
     <section class="section container" id="miriad-results" aria-labelledby="miriad-results-title" v-pre>
-      <div class="section-intro"><div><p class="kicker">04 / MODEL EVALUATION · RELEASE 03</p><h2 id="miriad-results-title">MIRIAD fine-tune, <span class="gradient-text">benchmarked on held-out data.</span></h2></div><p>All three releases scored on exactly the same held-out items, with the same browser engine as the 20 Nov results above, plus 15 MIRIAD questions from papers excluded from training. Evaluated 2026-11-25.</p></div>
+      <div class="section-intro"><div><p class="kicker">04 / MODEL EVALUATION · RELEASE 03</p><h2 id="miriad-results-title">MIRIAD fine-tune, <span class="gradient-text">benchmarked on held-out data.</span></h2></div><p>All three releases were scored on the same shared benchmarks using the browser engine. A separate PyTorch check compared Medical SFT and MIRIAD SFT on 15 questions from held-out MIRIAD papers. Evaluated 2026-11-25.</p></div>
       <div class="me-stats">
         <div class="me-stat"><span class="me-label">Medical Q&amp;A perplexity</span><b class="me-good">59.6 <small>MIRIAD SFT</small></b><p>253 for Medical SFT · 76% lower (paired 95% CI 71–81%). Same 80 held-out medical-o1 answers.</p></div>
         <div class="me-stat"><span class="me-label">PubMed perplexity</span><b>586 <small>MIRIAD SFT</small></b><p>667 Medical SFT · 572 Pretrained. The difference from Medical SFT is within noise (paired CI of the ratio 0.71–1.08).</p></div>
