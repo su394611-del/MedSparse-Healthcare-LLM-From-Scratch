@@ -97,7 +97,8 @@
     </section>
 
     <section class="section container" id="overview" aria-labelledby="overview-title">
-      <div class="section-intro"><div><p class="kicker">01 / ENGINEERING OVERVIEW</p><h2 id="overview-title">Built to understand <span class="gradient-text">every layer.</span></h2></div><p>Rather than loading official pretrained Mixtral weights, the project implements its own Mixtral-inspired decoder and trains it through biomedical pretraining, medical SFT, and MIRIAD SFT.</p></div>
+      <div class="section-intro"><div><p class="kicker">01 / ENGINEERING OVERVIEW</p><h2 id="overview-title">Built to understand <span class="gradient-text">every layer.</span></h2></div><p>Rather than loading official pretrained Mixtral weights, the project implements its own Mixtral-inspired decoder and trains it through biomedical pretraining, medical SFT, and MIRIAD SFT.</p>
+<p>MedSparse routes each token to two of four experts per layer. Its architectural inspiration is Jiang, A. Q., et al. (2024), <cite><a href="https://arxiv.org/abs/2401.04088">Mixtral of Experts</a></cite>.</p></div>
       <div class="features">
         <article class="feature-card"><span class="feature-glyph">◈</span><span class="feature-index">01 / ATTENTION</span><h3>Grouped-query attention</h3><p>Six query heads and two key/value heads, rotary position embeddings and causal scaled dot-product attention.</p><div class="pills"><span>GQA</span><span>RoPE</span><span>SDPA</span></div></article>
         <article class="feature-card"><span class="feature-glyph">✳</span><span class="feature-index">02 / MIXTURE-OF-EXPERTS</span><h3>Top-2 sparse routing</h3><p>Per-token routing across four independent SwiGLU experts with normalized weights and a balancing objective.</p><div class="pills"><span>4 experts</span><span>Top-2</span><span>Router loss</span></div></article>
